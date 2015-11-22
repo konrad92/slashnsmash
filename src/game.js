@@ -12,6 +12,10 @@
 (function() {
 	"use strict";
 	
+	// make vhs tape as loader icon
+	var vhsTape = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAYCAMAAAB9agt2AAAACVBMVEUAAAAdHR0uLi7jKkv9AAAAAXRSTlMAQObYZgAAAHJJREFUeAHt08EKgDAMA9A0///RHjZJFBltZeDBgLf2CbFCiXzwlIiXQjCfjwKsZBugr3GbIdX+AtD+AEgHJKyAMIA4HwGRA+bLSQFADtCQDw6vDGi1C4wi2AYINAErcSZfot8By3fAC+BxYOO/8APo7R/1xwXL3YSqTQAAAABJRU5ErkJggg==';
+	PLAYGROUND.LoadingScreen.logoRaw = vhsTape;
+	
 	var app = playground({
 		smoothing: false,
 		scale: 4,
