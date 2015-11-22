@@ -1,0 +1,23 @@
+/*
+	style.css
+	by Konrad Nowakowski
+*/
+
+body {
+	background: black;
+	margin: 0;
+	padding: 0;
+}
+
+.overdose {
+	margin-top: -45px;
+	text-align: center;
+	font-family: monospace;
+	font-size: 9pt;
+	color: white;
+	
+	position: fixed;
+	top: 50%;
+	left: 0;
+	right: 0;
+}
