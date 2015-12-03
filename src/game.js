@@ -13,6 +13,12 @@
 	"use strict";
 	
 	/**
+	 * Disable linear interpolation.
+	 * Use nearest neightbor instead.
+	 */
+	PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST;
+	
+	/**
 	 * App entry point.
 	 */
 	var app = {

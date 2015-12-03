@@ -7,6 +7,8 @@ body {
 	background: black;
 	margin: 0;
 	padding: 0;
+	
+	overflow: hidden;
 }
 
 .overdose {
@@ -29,6 +31,12 @@ canvas {
 	transform-origin: 0 0;
 	-webkit-transform: scale(4, 4);
 	transform: scale(4, 4);
+	
+	image-rendering: -moz-crisp-edges;
+	image-rendering:   -o-pixelated;
+	image-rendering: -webkit-pixelated;
+	image-rendering: pixelated;
+	-ms-interpolation-mode: nearest-neighbor;
 	
 	position: absolute;
 	left: 0;
