@@ -15,6 +15,8 @@
  * @param Object BBQ Engine public namespace.
  */
 (function(BBQ) {
+	"use strict";
+	
 	/**
 	 * Useful common utilities.
 	 */

@@ -21,3 +21,16 @@ body {
 	left: 0;
 	right: 0;
 }
+
+canvas {
+	display: block;
+	
+	-webkit-transform-origin: 0 0;
+	transform-origin: 0 0;
+	-webkit-transform: scale(4, 4);
+	transform: scale(4, 4);
+	
+	position: absolute;
+	left: 0;
+	top: 0;
+}
