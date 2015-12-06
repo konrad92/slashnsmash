@@ -11,6 +11,9 @@ body {
 	overflow: hidden;
 }
 
+/*
+	
+*/
 .overdose {
 	margin-top: -45px;
 	text-align: center;
@@ -24,20 +27,27 @@ body {
 	right: 0;
 }
 
+/*
+	Common game canvas.
+	Disables linear interpolation, nearest neightbor used instead.
+*/
 canvas {
 	display: block;
 	
+	/* up-scale */
 	-webkit-transform-origin: 0 0;
 	transform-origin: 0 0;
 	-webkit-transform: scale(4, 4);
 	transform: scale(4, 4);
 	
+	/* nearest neightbor interpolation */
 	image-rendering: -moz-crisp-edges;
 	image-rendering:   -o-pixelated;
 	image-rendering: -webkit-pixelated;
 	image-rendering: pixelated;
 	-ms-interpolation-mode: nearest-neighbor;
 	
+	/* pos-fix */
 	position: absolute;
 	left: 0;
 	top: 0;
