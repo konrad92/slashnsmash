@@ -168,6 +168,32 @@
 			// appends logs element
 			BBQ.DOM(document.createElement('li'))
 				.text(content).appendTo(this.logs);
+		},
+		
+		/**
+		 * Shows logger.
+		 */
+		show: function() {
+			this.container.style.display = 'block';
+		},
+		
+		/**
+		 * Hides logger.
+		 */
+		hide: function() {
+			this.container.style.display = 'none';
+		},
+		
+		/**
+		 * Toggles logger visibility.
+		 */
+		toggle: function() {
+			if(this.container.style.display === 'none') {
+				this.container.style.display = 'block';
+			}
+			else {
+				this.container.style.display = 'none';
+			}
 		}
 	};
 	
@@ -278,6 +304,15 @@
 		 * Handles viewport resize event.
 		 */
 		resize: function() {
+		},
+		
+		/**
+		 * Handle key input.
+		 */
+		keydown: function(event) {
+			if(event.key === 'f1') {
+				this.logger.toggle();
+			}
 		}
 	});
 })(window);
