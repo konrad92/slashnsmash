@@ -111,7 +111,9 @@
 			BBQ.DOM(document.createElement('span'))
 				.css({marginRight: '8px'})
 				.context,
-			BBQ.DOM(document.createElement('span')).context
+			BBQ.DOM(document.createElement('span'))
+				.text('---')
+				.context
 		];
 		
 		// creates common infobar
@@ -191,9 +193,13 @@
 		scale: 3,
 		
 		/**
-		 * FPS counter.
+		 * Performance detector.
 		 */
-		fps: 0,
+		performance: {
+			ticks: 0,
+			frame: 0,
+			fps: 0
+		},
 		
 		/**
 		 * Application creation event.
@@ -231,18 +237,41 @@
 					Math.random() * this.renderer.width,
 					Math.random() * this.renderer.height
 				);
+				spr.timer = Math.random()*Math.PI*2;
 				this.root.addChild(spr);
+			}
+		},
+		
+		/**
+		 * Move sprites.
+		 */
+		step: function(delta) {
+			for(var i in this.root.children) {
+				var child = this.root.children[i];
+				child.position.x += Math.cos(child.timer);
+				child.position.y += Math.sin(child.timer);
+				child.timer += delta;
 			}
 		},
 		
 		/**
 		 * Renders scene frame.
 		 */
-		render: function() {
+		render: function(delta) {
 			this.renderer.render(this.root);
 			
-			// update dynamic status
-			this.logger.fps('OPS: ' + this.ops);
+			// update ticks and FPS
+			this.performance.frame++;
+			this.performance.ticks += delta;
+			if(this.performance.ticks >= 1) {
+				// update FPS status
+				this.performance.fps = this.performance.frame;
+				this.logger.fps('FPS: ' + this.performance.fps);
+				
+				// reset counters
+				this.performance.ticks = 0;
+				this.performance.frame = 0;
+			}
 		},
 		
 		/**
