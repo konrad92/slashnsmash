@@ -28,6 +28,34 @@ body {
 }
 
 /*
+	Game logger container.
+*/
+#game-logger {
+	background: rgba(0, 0, 0, .5);
+	padding: 4px;
+	font-family: monospace;
+	font-size: 11px;
+	color: white;
+	
+	min-width: 40%;
+	
+	position: absolute;
+	left: 2px;
+	top: 2px;
+	z-index: 100;
+}
+
+#game-logger ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+#game-logger ul > li {
+	display: block;
+}
+
+/*
 	Common game canvas.
 	Disables linear interpolation, nearest neightbor used instead.
 */

@@ -98,6 +98,78 @@
 	};
 	
 	/**
+	 * Game on-screen logger functionality provider.
+	 * 
+	 * @param {PLAYGROUND.Application} app Playground application instance.
+	 */
+	function GameLogger(app) {
+		// store assigned application instance
+		this.app = app;
+		
+		// creates status elements
+		this.subinfo = [
+			BBQ.DOM(document.createElement('span'))
+				.css({marginRight: '8px'})
+				.context,
+			BBQ.DOM(document.createElement('span')).context
+		];
+		
+		// creates common infobar
+		this.infobar = BBQ.DOM(document.createElement('div'))
+			.append(this.subinfo[0], this.subinfo[1])
+			.context;
+		
+		// creates logs container
+		this.logs = BBQ.DOM(document.createElement('ul'))
+			.context;
+		
+		// creates container element and appends to body
+		this.container = BBQ.DOM(document.createElement('div'))
+			.id('game-logger')
+			.append(this.infobar, this.logs)
+			.done(document.body);
+	}
+	
+	// GameLogger class prototype
+	GameLogger.prototype = {
+		/**
+		 * Common ctor.
+		 */
+		constructor: GameLogger,
+		
+		/**
+		 * Static status content.
+		 */
+		status: function(content) {
+			this.subinfo[0].textContent = content;
+		},
+		
+		/**
+		 * Dynamic info content.
+		 */
+		fps: function(content) {
+			this.subinfo[1].textContent = content;
+		},
+		
+		/**
+		 * Appends new log row.
+		 * 
+		 * @param {String} content
+		 * @returns {GameLogger} Chaining *this* instance.
+		 */
+		log: function(content) {
+			// remove element from top
+			if(this.logs.childNodes.length > 5) {
+				this.logs.removeChild(this.logs.childNodes[0]);
+			}
+			
+			// appends logs element
+			BBQ.DOM(document.createElement('li'))
+				.text(content).appendTo(this.logs);
+		}
+	};
+	
+	/**
 	 * Game application instance.
 	 * 
 	 * @type PLAYGROUND.Application
@@ -119,35 +191,48 @@
 		scale: 3,
 		
 		/**
+		 * FPS counter.
+		 */
+		fps: 0,
+		
+		/**
 		 * Application creation event.
 		 */
 		create: function() {
+			// create logging element
+			this.logger = new GameLogger(this);
+			
 			// create Pixi properly renderer
 			this.createRenderer();
 			this.root = new PIXI.Container();
 			
 			// creates info-board
-			this.info = document.createElement('div');
-			BBQ.DOM(this.info).css({
-				position: 'absolute',
-				left: '2px',
-				top: '2px',
-				zIndex: 1,
-				background: 'rgba(0, 0, 0, .5)',
-				padding: '4px',
-				fontFamily: 'monospace',
-				fontSize: '11px',
-				color: 'white'
-			}).html(
+			this.logger.status(
 				this.renderer instanceof PIXI.WebGLRenderer ?
 					'WebGL' : 'Canvas'
-			).appendTo(document.body);
+			);
+		
+			// load game common images
+			this.logger.log('Loading images...');
+			this.loadImage('fatguy');
 		},
 		
 		/**
 		 * Assets loader ready event.
 		 */
 		ready: function() {
+			this.logger.log('Done.');
+			
+			// create sprite
+			for(var i = 0; i < 2000; i++) {
+				var spr = new PIXI.Sprite(this.tex('fatguy'));
+				spr.anchor = new PIXI.Point(0.5, 0.5);
+				spr.position = new PIXI.Point(
+					Math.random() * this.renderer.width,
+					Math.random() * this.renderer.height
+				);
+				this.root.addChild(spr);
+			}
 		},
 		
 		/**
@@ -155,6 +240,9 @@
 		 */
 		render: function() {
 			this.renderer.render(this.root);
+			
+			// update dynamic status
+			this.logger.fps('OPS: ' + this.ops);
 		},
 		
 		/**
