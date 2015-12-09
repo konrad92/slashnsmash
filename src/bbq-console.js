@@ -167,11 +167,8 @@
 		 * @returns {HTMLElement} On-screen console entry element.
 		 */
 		log: function(value) {
-			// call super method
 			_super.log.apply(this, arguments);
-
-			// append logs to out console
-			return BBQ.console.log(arguments[0].toString());
+			BBQ.console.log(value.toString());
 		},
 		
 		/**
@@ -181,7 +178,8 @@
 		 * @returns {HTMLElement} On-screen console entry element.
 		 */
 		info: function(value) {
-			this.log.apply(this, arguments).style.color = '#c0c0ff';
+			_super.info.apply(this, arguments);
+			BBQ.console.log(value.toString()).style.color = '#c0c0ff';
 		},
 		
 		/**
@@ -191,7 +189,8 @@
 		 * @returns {HTMLElement} On-screen console entry element.
 		 */
 		warn: function(value) {
-			this.log.apply(this, arguments).style.color = '#ffff80';
+			_super.warn.apply(this, arguments);
+			BBQ.console.log(value.toString()).style.color = '#ffff80';
 		},
 		
 		/**
@@ -201,7 +200,8 @@
 		 * @returns {HTMLElement} On-screen console entry element.
 		 */
 		error: function(value) {
-			this.log.apply(this, arguments).style.color = '#f03030';
+			_super.error.apply(this, arguments);
+			BBQ.console.log(value.toString()).style.color = '#f03030';
 		}
 	});
 })(window.BBQ = window.BBQ || {});
