@@ -49,6 +49,40 @@
 				classa.prototype = Object.create(classb.prototype),
 				proto
 			);
+		},
+		
+		/**
+		 * Enables/disables fullscreen feature.
+		 * 
+		 * @param {Boolean} enable Enable fullscreen.
+		 */
+		fullscreen: function(enable) {
+			// request fullscreen
+			if(enable) {
+				var body = document.body,
+					requestFullscreen = body.requestFullScreen ||
+										body.webkitRequestFullScreen ||
+										body.mozRequestFullScreen ||
+										body.msRequestFullScreen;
+				
+				// invoke request
+				if(requestFullscreen) {
+					requestFullscreen.call(body);
+				}
+			}
+			// close fullscreen
+			else {
+				var body = document.body,
+					closeFullscreen = body.closeFullScreen ||
+									  body.webkitCloseFullScreen ||
+									  body.mozCloseFullScreen ||
+									  body.msCloseFullScreen;
+				
+				// invoke request
+				if(closeFullscreen) {
+					closeFullscreen.call(body);
+				}
+			}
 		}
 	};
 	

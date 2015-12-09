@@ -313,6 +313,13 @@
 			if(event.key === 'f1') {
 				this.logger.toggle();
 			}
+		},
+		
+		/**
+		 * Handle pointer (mouse/touch) event.
+		 */
+		pointerdown: function(event) {
+			BBQ.Utils.fullscreen(true);
 		}
 	});
 })(window);
