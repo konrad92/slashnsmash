@@ -27,6 +27,9 @@
 		autoResize: true
 	});
 	
+	// hides <hello pixi>
+	PIXI.utils._saidHello = true;
+	
 	/**
 	 * Store old usable methods.
 	 */

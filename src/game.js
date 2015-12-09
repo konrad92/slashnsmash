@@ -65,8 +65,8 @@
 			
 			// keep centered position
 			this.logo.position = new PIXI.Point(
-				this.app.renderer.width / 2,
-				this.app.renderer.height / 2
+				Math.floor(this.app.renderer.width / 2),
+				Math.floor(this.app.renderer.height / 2)
 			);
 		},
 		
@@ -231,29 +231,32 @@
 		 * Application creation event.
 		 */
 		create: function() {
-			// create logging element
-			this.logger = new GameLogger(this);
-			
 			// create Pixi properly renderer
 			this.createRenderer();
 			this.root = new PIXI.Container();
 			
 			// creates info-board
-			this.logger.status(
+			BBQ.console.status(
 				this.renderer instanceof PIXI.WebGLRenderer ?
 					'WebGL' : 'Canvas'
 			);
 		
 			// load game common images
-			this.logger.log('Loading images...');
+			console.log('Loading images...');
 			this.loadImage('fatguy');
+			
+			// demo console
+			console.log('Simple log');
+			console.info('Info log');
+			console.warn('Warn log');
+			console.error('Error log');
 		},
 		
 		/**
 		 * Assets loader ready event.
 		 */
 		ready: function() {
-			this.logger.log('Done.');
+			//this.logger.log('Done.');
 			
 			// create sprite
 			for(var i = 0; i < 2000; i++) {
@@ -292,7 +295,7 @@
 			if(this.performance.ticks >= 1) {
 				// update FPS status
 				this.performance.fps = this.performance.frame;
-				this.logger.fps('FPS: ' + this.performance.fps);
+				BBQ.console.fps('FPS: ' + this.performance.fps);
 				
 				// reset counters
 				this.performance.ticks = 0;
@@ -311,7 +314,8 @@
 		 */
 		keydown: function(event) {
 			if(event.key === 'f1') {
-				this.logger.toggle();
+				BBQ.console.toggle();
+				return false;
 			}
 		},
 		
