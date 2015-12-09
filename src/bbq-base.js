@@ -121,14 +121,11 @@
 		 */
 		on: function(type, callback) {
 			if(this.context.addEventListener) {
-				this.context.addEventListener(type, callback, false);
-			}
-			else if(this.context.attachEvent) {
-				this.context.attachEvent('on' + type, callback);
+				this.context.addEventListener.apply(this.context, arguments);
 			}
 			else {
 				// oups, function not recorgnized
-				console.error('No event binding functionality!');
+				console.error('No event binding functionality found!');
 			}
 			
 			return this;
