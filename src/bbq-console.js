@@ -150,16 +150,16 @@
 	 * Stores old Console functionality.
 	 */
 	var _super = {
-		log: console.log,
-		info: console.info,
-		warn: console.warn,
-		error: console.error
+		log: window.console.log,
+		info: window.console.info,
+		warn: window.console.warn,
+		error: window.console.error
 	};
 	
 	/**
 	 * Extends native Console functionality.
 	 */
-	BBQ.Utils.assign(console, {
+	BBQ.Utils.assign(window.console, {
 		/**
 		 * Logs new value into both consoles - native and on-screen.
 		 * 
