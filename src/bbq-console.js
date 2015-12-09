@@ -12,7 +12,7 @@
 /**
  * BBQ Console Module.
  * 
- * @param Object BBQ Engine public namespace.
+ * @param {Object} BBQ Engine public namespace.
  */
 (function(BBQ) {
 	"use strict";
@@ -126,7 +126,7 @@
 	})();
 	
 	/**
-	 * Adds DOM content on-load listener.
+	 * Shows console on-screen container on-DOM-content-load.
 	 */
 	document.addEventListener("DOMContentLoaded", function(event) {
 		if(BBQ.console.showOnReady) {

@@ -12,8 +12,8 @@
 /**
  * BBQ Rendering Module.
  * 
- * @param Object BBQ Engine public namespace.
- * @param PIXI Pixi PIXI rendering engine namespace.
+ * @param {Object} BBQ Engine public namespace.
+ * @param {PIXI} Pixi PIXI rendering engine namespace.
  */
 (function(BBQ, PLAYGROUND, PIXI) {
 	"use strict";
@@ -31,9 +31,9 @@
 	PIXI.utils._saidHello = true;
 	
 	/**
-	 * Store old usable methods.
+	 * Stores old usable methods.
 	 */
-	var old = {
+	var _super = {
 		getAssetEntry: PLAYGROUND.Application.prototype.getAssetEntry
 	};
 	
@@ -45,8 +45,8 @@
 		 * Assigns an new Pixi renderer to Prototype.Application instance.
 		 * Creates WebGL one or uses fallback Canvas renderer.
 		 * 
-		 * @param Object options PIXI renderer options.
-		 * @returns PIXI.SystemRenderer Properly detected renderer.
+		 * @param {Object} options PIXI renderer options.
+		 * @returns {PIXI.SystemRenderer} Properly detected renderer.
 		 */
 		createRenderer: function(options) {
 			// created new renderer
@@ -127,7 +127,7 @@
 			}
 			
 			// use old method
-			return old.getAssetEntry.apply(this, arguments);
+			return _super.getAssetEntry.apply(this, arguments);
 		}
 	});
 })(window.BBQ = window.BBQ || {}, PLAYGROUND, PIXI);

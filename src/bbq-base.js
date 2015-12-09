@@ -116,7 +116,7 @@
 		 * Binds event to the assigned element.
 		 * 
 		 * @param {String} type 
-		 * @param {type} callback
+		 * @param {Function} callback
 		 * @return {BBQ.DOM.Element} Chaining *this* instance.
 		 */
 		on: function(type, callback) {
@@ -200,7 +200,7 @@
 		/**
 		 * Changes *this* element's text content.
 		 * 
-		 * @param String content HTML entries as string.
+		 * @param {String} content HTML entries as string.
 		 * @return {BBQ.DOM.Element} Chaining *this* instance.
 		 */
 		text: function(content) {
@@ -211,7 +211,7 @@
 		/**
 		 * Changes *this* element's content.
 		 * 
-		 * @param String content HTML entries as string.
+		 * @param {String} content HTML entries as string.
 		 * @return {BBQ.DOM.Element} Chaining *this* instance.
 		 */
 		html: function(content) {
@@ -224,7 +224,7 @@
 		 * DOM raw *this* HTML element.
 		 * 
 		 * @param {HTMLElement|BBQ.DOM.Element} target Target HTML element.
-		 * @returns {HTMLElement} Raw HTML element.
+		 * @return {HTMLElement} Raw HTML element.
 		 */
 		done: function(target) {
 			if(typeof target !== 'undefined') {

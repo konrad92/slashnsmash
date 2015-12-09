@@ -57,7 +57,7 @@
 		/**
 		 * Process the loader progress.
 		 * 
-		 * @param Number delta Delta time between last frame.
+		 * @param {Number} delta Delta time between last frame.
 		 */
 		step: function(delta) {
 			// progress status
@@ -94,106 +94,6 @@
 			
 			// render loader stage
 			this.app.renderer.render(this.logo);
-		}
-	};
-	
-	/**
-	 * Game on-screen logger functionality provider.
-	 * 
-	 * @param {PLAYGROUND.Application} app Playground application instance.
-	 */
-	function GameLogger(app) {
-		// store assigned application instance
-		this.app = app;
-		
-		// creates status elements
-		this.subinfo = [
-			BBQ.DOM(document.createElement('span'))
-				.css({marginRight: '8px'})
-				.context,
-			BBQ.DOM(document.createElement('span'))
-				.text('---')
-				.context
-		];
-		
-		// creates common infobar
-		this.infobar = BBQ.DOM(document.createElement('div'))
-			.append(this.subinfo[0], this.subinfo[1])
-			.context;
-		
-		// creates logs container
-		this.logs = BBQ.DOM(document.createElement('ul'))
-			.context;
-		
-		// creates container element and appends to body
-		this.container = BBQ.DOM(document.createElement('div'))
-			.id('game-logger')
-			.append(this.infobar, this.logs)
-			.done(document.body);
-	}
-	
-	// GameLogger class prototype
-	GameLogger.prototype = {
-		/**
-		 * Common ctor.
-		 */
-		constructor: GameLogger,
-		
-		/**
-		 * Static status content.
-		 */
-		status: function(content) {
-			this.subinfo[0].textContent = content;
-		},
-		
-		/**
-		 * Dynamic info content.
-		 */
-		fps: function(content) {
-			this.subinfo[1].textContent = content;
-		},
-		
-		/**
-		 * Appends new log row.
-		 * 
-		 * @param {String} content
-		 * @returns {GameLogger} Chaining *this* instance.
-		 */
-		log: function(content) {
-			// remove element from top
-			if(this.logs.childNodes.length > 5) {
-				this.logs.removeChild(this.logs.childNodes[0]);
-			}
-			
-			// appends logs element
-			BBQ.DOM(document.createElement('li'))
-				.text(content).appendTo(this.logs);
-		},
-		
-		/**
-		 * Shows logger.
-		 */
-		show: function() {
-			this.container.style.display = 'block';
-		},
-		
-		/**
-		 * Hides logger.
-		 */
-		hide: function() {
-			this.container.style.display = 'none';
-		},
-		
-		/**
-		 * Toggles logger visibility.
-		 */
-		toggle: function() {
-			if(this.container.style.display === 'none') {
-				this.container.style.display = 'block';
-			}
-			else {
-				this.container.style.display = 'none';
-			}
 		}
 	};
 	
