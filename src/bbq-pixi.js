@@ -81,7 +81,7 @@
 				window.innerHeight / this.scale
 			);
 
-			// scale-up canvas element via CSS process
+			// scale-up canvas element via CSS transform property
 			var scale2d = 'scale('+this.scale+','+this.scale+')';
 			this.renderer.view.style.msTransform = scale2d;
 			this.renderer.view.style.webkitTransform = scale2d;

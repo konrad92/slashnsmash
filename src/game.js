@@ -144,19 +144,13 @@
 			// load game common images
 			console.log('Loading images...');
 			this.loadImage('fatguy');
-			
-			// demo console
-			console.log('Simple log');
-			console.info('Info log');
-			console.warn('Warn log');
-			console.error('Error log');
 		},
 		
 		/**
 		 * Assets loader ready event.
 		 */
 		ready: function() {
-			//this.logger.log('Done.');
+			console.log('Images loading done.', this.images);
 			
 			// create sprite
 			for(var i = 0; i < 2000; i++) {

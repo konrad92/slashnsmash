@@ -45,13 +45,19 @@ body {
 	z-index: 100;
 }
 
-#game-logger ul {
+#game-logger > div {
+	margin-bottom: 4px;
+	padding-bottom: 4px;
+	border-bottom: solid 1px #ddd;
+}
+
+#game-logger > ul {
 	margin: 0;
 	padding: 0;
 	list-style: none;
 }
 
-#game-logger ul > li {
+#game-logger > ul > li {
 	display: block;
 }
 
