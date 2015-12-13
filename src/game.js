@@ -98,6 +98,40 @@
 	};
 	
 	/**
+	 * Common game stage.
+	 */
+	function GameState() {
+		// inheritance ctor
+		BBQ.State.call(this);
+	}
+	
+	// extends GameStage by BBQ.Stage class
+	BBQ.Utils.extends(GameState, BBQ.State, {
+		/**
+		 * Common ctor.
+		 */
+		constructor: GameState,
+		
+		/**
+		 * Creates scene.
+		 */
+		create: function() {
+			var spr = new BBQ.Actor(this.app.tex('fatguy'));
+			spr.update = function(delta) {
+				this.position.y += delta * 10;
+			};
+			this.actors.addChild(spr);
+			
+			spr = new BBQ.Actor(this.app.tex('fatguy'));
+			spr.position.y = -100;
+			spr.update = function(delta) {
+				this.position.y += delta * 40;
+			};
+			this.actors.addChild(spr);
+		}
+	});
+	
+	/**
 	 * Game application instance.
 	 * 
 	 * @type PLAYGROUND.Application
@@ -131,58 +165,44 @@
 		 * Application creation event.
 		 */
 		create: function() {
-			// create Pixi properly renderer
+			// create PIXI properly renderer
 			this.createRenderer();
-			this.root = new PIXI.Container();
 			
 			// creates info-board
 			BBQ.console.status(
 				this.renderer instanceof PIXI.WebGLRenderer ?
 					'WebGL' : 'Canvas'
 			);
-		
-			// load game common images
-			console.log('Loading images...');
-			this.loadImage('fatguy');
+			
+			// perform assets loading
+			// FOR DEMO PURPOSES ONLY, DO NOT BASE ON IT
+			console.log('Loading game assets...');
+			
+			// load images assets
+			this.loadImages('fatguy', 'gears', 'vhstape');
 		},
 		
 		/**
 		 * Assets loader ready event.
 		 */
 		ready: function() {
-			console.log('Images loading done.', this.images);
+			console.log('Loading done.', this.images);
 			
-			// create sprite
-			for(var i = 0; i < 2000; i++) {
-				var spr = new PIXI.Sprite(this.tex('fatguy'));
-				spr.anchor = new PIXI.Point(0.5, 0.5);
-				spr.position = new PIXI.Point(
-					Math.random() * this.renderer.width,
-					Math.random() * this.renderer.height
-				);
-				spr.timer = Math.random()*Math.PI*2;
-				this.root.addChild(spr);
-			}
+			// switch to game state
+			this.setState(new GameState());
 		},
 		
 		/**
 		 * Move sprites.
 		 */
 		step: function(delta) {
-			for(var i in this.root.children) {
-				var child = this.root.children[i];
-				child.position.x += Math.cos(child.timer);
-				child.position.y += Math.sin(child.timer);
-				child.timer += delta;
-			}
+			// dummy method
 		},
 		
 		/**
 		 * Renders scene frame.
 		 */
 		render: function(delta) {
-			this.renderer.render(this.root);
-			
 			// update ticks and FPS
 			this.performance.frame++;
 			this.performance.ticks += delta;
