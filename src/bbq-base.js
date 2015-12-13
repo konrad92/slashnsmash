@@ -39,6 +39,7 @@
 
 		/**
 		 * Extends classes between prototypes.
+		 * Automates constructor reassign.
 		 * 
 		 * @param {Function} classa Class to prepare.
 		 * @param {Function} classb Extends from this class.
@@ -46,7 +47,9 @@
 		 */
 		extends: function(classa, classb, proto) {
 			BBQ.Utils.assign(
-				classa.prototype = Object.create(classb.prototype),
+				classa.prototype = Object.create(classb.prototype), {
+					constructor: classa
+				},
 				proto
 			);
 		},
