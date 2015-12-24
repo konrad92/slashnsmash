@@ -1,7 +1,7 @@
 /*
- * states.js
+ * stage.js
  * 
- * States definitions stack.
+ * All game stages definitions stack.
  * 
  * Licensed under MIT license.
  * For license details please check the LICENSE file of the project.
@@ -18,6 +18,34 @@
  */
 (function(Game, BBQ, PIXI) {
 	"use strict";
+	
+	/**
+	 * Common stage definition.
+	 */
+	Game.Stage = function() {
+		BBQ.State.call(this);
+	};
+	
+	// extends Game.Stage by BBQ.State class
+	BBQ.Utils.extends(Game.Stage, BBQ.State, {
+		/**
+		 * Prepares game stage.
+		 */
+		create: function() {
+			
+		},
+		
+		/**
+		 * Updates stage frame.
+		 */
+		step: function(delta) {
+			// update common gameplay actors and camera
+			BBQ.State.prototype.step.call(this, delta);
+			
+			// update backgrounds & UIs
+			
+		}
+	});
 	
 	/**
 	 * All game stages definitions.

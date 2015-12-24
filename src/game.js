@@ -139,21 +139,29 @@
 		/**
 		 * Creates scene.
 		 */
-		create: function() {
+		enter: function() {
 			var spr = new BBQ.Actor(this.app.tex('fatguy'));
+			spr.anchor = new PIXI.Point(0.5, 0.5);
 			spr.update = function(delta) {
-				this.position.y += delta * 10;
+				this.position.x += delta * 20;
 			};
 			this.actors.addChild(spr);
 			this.camera.follow(spr);
 			
 			spr = new BBQ.Actor(this.app.tex('fatguy'));
-			spr.position.y = -100;
+			spr.position.y = 0;
+			spr.anchor = new PIXI.Point(0.5, 0.5);
 			spr.update = function(delta) {
-				this.position.y += delta * 40;
+				//this.position.x += delta * 20;
 			};
 			this.actors.addChild(spr);
 			this.camera.follow(spr);
+			
+			this.background.addBackground(
+				this.app.tex('townsky'),
+				new PIXI.Point(0.5, 0.5),
+				new PIXI.Point(0, -50)
+			);
 		}
 	});
 	
@@ -272,7 +280,7 @@
 		 * Handle pointer (mouse/touch) event.
 		 */
 		pointerdown: function(event) {
-			//BBQ.Utils.fullscreen(true);
+			BBQ.Utils.fullscreen(true);
 		}
 	});
 })(window);

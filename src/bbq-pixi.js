@@ -75,6 +75,14 @@
 		 * Keeps canvas view aspect.
 		 */
 		keepAspect: function() {
+			// change scale size
+			if(window.innerWidth < 768) {
+				this.scale = 2;
+			}
+			else {
+				this.scale = 3;
+			}
+			
 			// resize canvas element
 			this.renderer.resize(
 				window.innerWidth / this.scale,

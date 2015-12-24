@@ -104,28 +104,56 @@
 	});
 	
 	/**
+	 * Basic camera for rendering from centered axis.
+	 */
+	BBQ.Camera = function(renderer) {
+		// inherited ctor call
+		PIXI.Container.call(this);
+		
+		// renderer setup
+		this.renderer = renderer;
+	};
+	
+	// extends BBQ.CenteredContainer
+	BBQ.Utils.extends(BBQ.Camera, PIXI.Container, {
+		/**
+		 * Pre-render update transform.
+		 */
+		updateTransform: function() {
+			var _cx = this.renderer.width / 2,
+				_cy = this.renderer.height / 2;
+			
+			// center camera position
+			this.position.x += _cx;
+			this.position.y += _cy;
+			
+			// update transforms
+			PIXI.Container.prototype.updateTransform.call(this);
+			
+			// re-position centered camera
+			this.position.x -= _cx;
+			this.position.y -= _cy;
+		}
+	});
+	
+	/**
 	 * State camera manipulation class.
 	 */
-	BBQ.Camera = function(x, y) {
+	BBQ.FollowCamera = function(renderer, x, y) {
 		// inherited ctor call
-		PIXI.Container.apply(this);
+		BBQ.Camera.call(this, renderer);
 		
 		// setup position
 		this.position.x = x || 0;
 		this.position.y = y || 0;
 	};
 	
-	// extends BBQ.Camera by PIXI.Container class
-	BBQ.Utils.extends(BBQ.Camera, PIXI.Container, {
+	// extends BBQ.Camera by BBQ.Camera class
+	BBQ.Utils.extends(BBQ.FollowCamera, BBQ.Camera, {
 		/**
 		 * Camera follows given actors set.
 		 */
 		followed: [],
-		
-		/**
-		 * Determines centered camera.
-		 */
-		centered: true,
 		
 		/**
 		 * Add actor to follow set.
@@ -155,27 +183,65 @@
 		/**
 		 * Update camera position.
 		 */
-		update: function(delta, app) {
+		update: function(delta) {
+			// follow actors
 			if(this.followed.length > 0) {
 				// get positions of all actors
-				var _x = 0, _y = 0;
+				var _x = 0;
 				for(var i in this.followed) {
 					var actor = this.followed[i];
 					_x -= actor.position.x;
-					// uncomment to enable Y following axis
-					//_y -= actor.position.y;
 				}
 				
 				// calculate centered position of actors
 				this.position.x = _x / this.followed.length;
-				this.position.y = _y / this.followed.length;
-				
-				// center camera position
-				if(this.centered) {
-					this.position.x += app.renderer.width / 2;
-					this.position.y += app.renderer.height / 2;
-				}
 			}
+		}
+	});
+	
+	/**
+	 * Allows make parallax backgrounds.
+	 */
+	BBQ.ParallaxBackground = function(camera) {
+		// inherited ctor call
+		PIXI.Container.call(this);
+		
+		// store assigned camera
+		this.camera = camera;
+	};
+	
+	// extends BBQ.ParallaxBackground by PIXI.Container
+	BBQ.Utils.extends(BBQ.ParallaxBackground, PIXI.Container, {
+		addBackground: function(texture, parallax, offset) {
+			var bg = new PIXI.extras.TilingSprite(
+				texture,
+				this.camera.renderer.width,
+				this.camera.renderer.height
+			);
+			bg.parallaxScale = parallax || new PIXI.Point();
+			bg.parallaxOffset = offset || new PIXI.Point();
+			this.addChild(bg);
+		},
+		
+		updateTransform: function(delta) {
+			var camera = this.camera;
+			this.children.forEach(function(bg) {
+				// resize bg
+				bg.width = camera.renderer.width;
+				bg.height = camera.renderer.height;
+				
+				// center-up parallax background
+				bg.tilePosition.x = bg.width / 2 - bg.texture.width / 2;
+				bg.tilePosition.y = bg.height / 2 - bg.texture.height / 2;
+				
+				// apply bg offsets
+				bg.tilePosition.x += bg.parallaxOffset.x;
+				bg.tilePosition.y += bg.parallaxOffset.y;
+				
+				// apply parallax offsets
+				bg.tilePosition.x += camera.x * bg.parallaxScale.x;
+				bg.tilePosition.y += camera.y * bg.parallaxScale.y;
+			});
 		}
 	});
 	
@@ -185,33 +251,37 @@
 	BBQ.State = function() {
 		// inheritance ctor
 		PIXI.Container.call(this);
-		
-		// camera instance
-		this.camera = new BBQ.Camera();
-		
-		// the background objects container
-		this.background = new PIXI.Container();
-		
-		// create common actors layer
-		this.actors = new PIXI.Container();
-		
-		// the foreground objects container
-		this.foreground = new PIXI.Container();
-		
-		// add layers by right order
-		this.camera.addChild(this.background);
-		this.camera.addChild(this.actors);
-		
-		this.addChild(this.camera);
-		this.addChild(this.foreground);
 	};
 	
-	// extends BBQ.Stage by PIXI.Container class
+	// extends BBQ.State by PIXI.Container class
 	BBQ.Utils.extends(BBQ.State, PIXI.Container, {
 		/**
 		 * Common ctor.
 		 */
 		constructor: BBQ.State,
+		
+		/**
+		 * Prepares state scene before first use.
+		 */
+		create: function() {
+			// camera instance
+			this.camera = new BBQ.FollowCamera(this.app.renderer);
+
+			// the background objects container
+			this.background = new BBQ.ParallaxBackground(this.camera);
+
+			// create common actors layer
+			this.actors = new PIXI.Container();
+			this.camera.addChild(this.actors);
+
+			// the foreground objects container
+			this.foreground = new PIXI.Container();
+
+			// add layers by right order
+			this.addChild(this.background);
+			this.addChild(this.camera);
+			this.addChild(this.foreground);
+		},
 		
 		/**
 		 * Updates frame of stage layers.
@@ -226,7 +296,7 @@
 			this.performLayer(this.actors, 'update', delta, this.app);
 			
 			// update camera
-			this.camera.update(delta, this.app);
+			this.camera.update(delta);
 		},
 		
 		/**
