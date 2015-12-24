@@ -157,11 +157,16 @@
 			this.actors.addChild(spr);
 			this.camera.follow(spr);
 			
-			this.background.addBackground(
-				this.app.tex('townsky'),
-				new PIXI.Point(0.5, 0.5),
-				new PIXI.Point(0, -50)
-			);
+			this.background.addBackground(this.app.tex('townsky'), {
+				scale: new PIXI.Point(.5, .5)
+			});
+			
+			this.background.addBackground(this.app.tex('road'), {
+				scale: new PIXI.Point(1, 1),
+				offset: new PIXI.Point(0, 38),
+				vtiled: false,
+				htiled: true
+			});
 		}
 	});
 	

@@ -212,36 +212,73 @@
 	
 	// extends BBQ.ParallaxBackground by PIXI.Container
 	BBQ.Utils.extends(BBQ.ParallaxBackground, PIXI.Container, {
-		addBackground: function(texture, parallax, offset) {
+		addBackground: function(texture, options) {
+			options = BBQ.Utils.assign({
+				htiled: true,
+				vtiled: true
+			}, options);
+			
+			// create bg instance
 			var bg = new PIXI.extras.TilingSprite(
 				texture,
-				this.camera.renderer.width,
-				this.camera.renderer.height
+				options.htiled ? this.camera.renderer.width : texture.width,
+				options.vtiled ? this.camera.renderer.height : texture.height
 			);
-			bg.parallaxScale = parallax || new PIXI.Point();
-			bg.parallaxOffset = offset || new PIXI.Point();
-			this.addChild(bg);
+			
+			// parallax background settings
+			bg.parallaxScale = options.scale || new PIXI.Point(0, 0);
+			bg.parallaxOffset = options.offset || new PIXI.Point(0, 0);
+			
+			// tiling options
+			bg.htiled = options.htiled;
+			bg.vtiled = options.vtiled;
+			
+			// append background
+			return this.addChild(bg);
 		},
 		
 		updateTransform: function(delta) {
 			var camera = this.camera;
 			this.children.forEach(function(bg) {
-				// resize bg
-				bg.width = camera.renderer.width;
-				bg.height = camera.renderer.height;
+				// h-tiled
+				if(bg.htiled) {
+					// resize bg
+					bg.width = camera.renderer.width;
+					// center-up parallax background
+					bg.tilePosition.x = bg.width / 2 - bg.texture.width / 2;
+					// apply bg offsets
+					bg.tilePosition.x += bg.parallaxOffset.x;
+					// apply parallax offsets
+					bg.tilePosition.x += camera.x * bg.parallaxScale.x;
+				}
+				else {
+					// re-position background by offset
+					bg.position.x = bg.parallaxOffset.x - bg.width / 2;
+					// apply parallax offsets
+					bg.position.x += camera.x * bg.parallaxScale.x;
+				}
 				
-				// center-up parallax background
-				bg.tilePosition.x = bg.width / 2 - bg.texture.width / 2;
-				bg.tilePosition.y = bg.height / 2 - bg.texture.height / 2;
-				
-				// apply bg offsets
-				bg.tilePosition.x += bg.parallaxOffset.x;
-				bg.tilePosition.y += bg.parallaxOffset.y;
-				
-				// apply parallax offsets
-				bg.tilePosition.x += camera.x * bg.parallaxScale.x;
-				bg.tilePosition.y += camera.y * bg.parallaxScale.y;
+				// v-tiled
+				if(bg.vtiled) {
+					// resize bg
+					bg.height = camera.renderer.height;
+					// center-up parallax background
+					bg.tilePosition.y = bg.height / 2 - bg.texture.height / 2;
+					// apply bg offsets
+					bg.tilePosition.y += bg.parallaxOffset.y;
+					// apply parallax offsets
+					bg.tilePosition.y += camera.y * bg.parallaxScale.y;
+				}
+				else {
+					// re-position background by offset
+					bg.position.y = bg.parallaxOffset.y + camera.renderer.height / 2 - bg.height / 2;
+					// apply parallax offsets
+					bg.position.y += camera.y * bg.parallaxScale.y;
+				}
 			});
+			
+			// common transform update
+			PIXI.Container.prototype.updateTransform.call(this);
 		}
 	});
 	
@@ -267,7 +304,7 @@
 			// camera instance
 			this.camera = new BBQ.FollowCamera(this.app.renderer);
 
-			// the background objects container
+			// the background layers
 			this.background = new BBQ.ParallaxBackground(this.camera);
 
 			// create common actors layer
