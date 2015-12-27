@@ -24,6 +24,8 @@
 	 */
 	Game.Stage = function() {
 		BBQ.State.call(this);
+		
+		this.players = [];
 	};
 	
 	// extends Game.Stage by BBQ.State class
@@ -31,19 +33,42 @@
 		/**
 		 * Prepares game stage.
 		 */
-		create: function() {
+		enter: function() {
+			this.background.addBackground('townsky', {
+				scale: new PIXI.Point(.5, .5)
+			});
 			
+			this.background.addBackground('road', {
+				scale: new PIXI.Point(1, 1),
+				offset: new PIXI.Point(0, -22),
+				vtiled: false,
+				htiled: true
+			});
+			
+			var chara = new Game.Actors.Character('fatguy');
+			chara.position.x = 60;
+			this.actors.addChild(chara);
+			this.camera.follow(chara);
+			this.players.push(chara);
+			
+			var spr = new BBQ.Actor(Game.app.tex('fatguy'));
+			spr.position.x = 60;
+			spr.position.y = 50;
+			spr.anchor.x = 0.5;
+			spr.anchor.y = 1;
+			this.actors.addChild(spr);
 		},
 		
-		/**
-		 * Updates stage frame.
-		 */
-		step: function(delta) {
-			// update common gameplay actors and camera
-			BBQ.State.prototype.step.call(this, delta);
-			
-			// update backgrounds & UIs
-			
+		keydown: function(e) {
+			this.players.forEach(function(player) {
+				player.enqueueEvent('keydown', e.key, e);
+			}, this);
+		},
+		
+		keyup: function(e) {
+			this.players.forEach(function(player) {
+				player.enqueueEvent('keyup', e.key, e);
+			}, this);
 		}
 	});
 	

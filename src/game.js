@@ -54,7 +54,7 @@
 		 * Loading scene done. Quitting.
 		 */
 		leave: function() {
-			
+			console.log('Loading done.');
 		},
 		
 		/**
@@ -118,64 +118,11 @@
 	};
 	
 	/**
-	 * Common game stage.
-	 */
-	function GameState() {
-		// inheritance ctor
-		BBQ.State.call(this);
-	}
-	
-	// extends GameStage by BBQ.Stage class
-	BBQ.Utils.extends(GameState, BBQ.State, {
-		prefs: {
-			ground: 'road',
-		},
-		
-		/**
-		 * Common ctor.
-		 */
-		constructor: GameState,
-		
-		/**
-		 * Creates scene.
-		 */
-		enter: function() {
-			var spr = new BBQ.Actor(this.app.tex('fatguy'));
-			spr.anchor = new PIXI.Point(0.5, 0.5);
-			spr.update = function(delta) {
-				this.position.x += delta * 20;
-			};
-			this.actors.addChild(spr);
-			this.camera.follow(spr);
-			
-			spr = new BBQ.Actor(this.app.tex('fatguy'));
-			spr.position.y = 0;
-			spr.anchor = new PIXI.Point(0.5, 0.5);
-			spr.update = function(delta) {
-				//this.position.x += delta * 20;
-			};
-			this.actors.addChild(spr);
-			this.camera.follow(spr);
-			
-			this.background.addBackground(this.app.tex('townsky'), {
-				scale: new PIXI.Point(.5, .5)
-			});
-			
-			this.background.addBackground(this.app.tex('road'), {
-				scale: new PIXI.Point(1, 1),
-				offset: new PIXI.Point(0, 38),
-				vtiled: false,
-				htiled: true
-			});
-		}
-	});
-	
-	/**
 	 * Game application instance.
 	 * 
 	 * @type PLAYGROUND.Application
 	 */
-	var app = playground({
+	Game.app = playground({
 		/**
 		 * Common assets paths.
 		 */
@@ -234,10 +181,8 @@
 		 * Assets loader ready event.
 		 */
 		ready: function() {
-			console.log('Loading done.', this.images);
-			
 			// switch to game state
-			this.setState(new GameState());
+			this.setState(new Game.Stage());
 		},
 		
 		/**
@@ -285,7 +230,7 @@
 		 * Handle pointer (mouse/touch) event.
 		 */
 		pointerdown: function(event) {
-			BBQ.Utils.fullscreen(true);
+			//BBQ.Utils.fullscreen(true);
 		}
 	});
 })(window);

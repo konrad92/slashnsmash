@@ -51,23 +51,29 @@
 		 * @returns {BBQ.Actor} Chaining *this* instance.
 		 */
 		emitSignal: function(signal) {
-			var signalFunc = this.signals[signal];
-			if(typeof signalFunc === 'function') {
-				var slicedArguments = Array.prototype.slice.call(arguments, 1);
-				signalFunc.apply(this, slicedArguments);
+			var signals = this.signals[signal],
+				slicedArguments = Array.prototype.slice.call(arguments, 1);
+			if(typeof signals !== 'undefined' && signals.length > 0) {
+				signals.forEach(function(s) {
+					s.callback.apply(s.context, slicedArguments);
+				});
 			}
 			return this;
 		},
 		
 		/**
-		 * Binds signal callback.
+		 * Binds another signal callback.
 		 * 
-		 * @param {String} signal Signal name to bind.
-		 * @param {Function} callback Signal callback to call.
+		 * @param {String} signal Signal name for bind.
+		 * @param {Function} callback Signal callback to append.
 		 * @returns {BBQ.Actor} Chaining *this* instance.
 		 */
-		bindSignal: function(signal, callback) {
-			this.signals[signal] = callback;
+		bindSignal: function(signal, callback, context) {
+			this.signals[signal] = this.signals[signal] || [];
+			this.signals[signal].push({
+				callback: callback,
+				context: context || this
+			});
 			return this;
 		},
 		
@@ -77,7 +83,23 @@
 		 * @param {String} signal Signal name to unbind.
 		 * @returns {BBQ.Actor} Chaining *this* instance.
 		 */
-		unbindSignal: function(signal) {
+		unbindSignal: function(signal, callback) {
+			var signals = this.signals[signal], index = -1;
+			if(typeof signals !== 'undefined' && signals.length > 0) {
+				this.signals[signal] = signals.filter(function(s) {
+					return !(s.callback === callback);
+				});
+			}
+			return this;
+		},
+		
+		/**
+		 * Clears all binded signals.
+		 * 
+		 * @param {String} signal Signal name to clear.
+		 * @returns {BBQ.Actor} Chaining *this* instance.
+		 */
+		clearSignal: function(signal) {
 			delete this.signals[signal];
 			return this;
 		},
@@ -85,21 +107,138 @@
 		/**
 		 * Enqueues event into events array.
 		 * 
-		 * @param {Object} event Event object.
+		 * @param {String} event Event name (signal).
 		 * @returns {BBQ.Actor} Chaining *this* instance.
 		 */
 		enqueueEvent: function(event) {
-			Array.prototype.push.apply(this.events, arguments);
+			this.events.push({
+				name: event,
+				args: Array.prototype.slice.call(arguments, 1)
+			});
 			return this;
 		},
 		
 		/**
 		 * Dequeues event from events array.
 		 * 
-		 * @returns {Object} Shifted (removed) element from end.
+		 * @returns {Object|Boolean} First event, FLASE if no more events remaining.
 		 */
 		dequeueEvent: function() {
-			return this.events.pop();
+			if(this.events.length === 0) {
+				return false;
+			}
+			// get event from beginning
+			var event = this.events[0];
+			// remove event from beginnig
+			this.events = this.events.slice(1);
+			//this.events.shift();
+			// return the catched event
+			return event;
+		},
+		
+		/**
+		 * Enroll remaining events.
+		 * 
+		 * @param {Number} delta Frame delta time.
+		 */
+		update: function(delta) {
+			var event;
+			while((event = this.dequeueEvent()) !== false) {
+				// emits event signal
+				this.emitSignal.apply(this,
+					Array.prototype.concat.apply([event.name], event.args)
+				);
+			}
+		}
+	});
+	
+	/**
+	 * Basic animated actor.
+	 */
+	BBQ.AnimatedActor = function() {
+		// inherited ctor call
+		BBQ.Actor.apply(this, arguments);
+	};
+	
+	// extends BBQ.AnimatedActor by BBQ.Actor class
+	BBQ.Utils.extends(BBQ.AnimatedActor, BBQ.Actor, {
+		/**
+		 * Animation frames to use.
+		 */
+		animations: {
+			idle: {
+				time: 1,
+				frames: [0]
+			}
+		},
+		
+		/**
+		 * Current frame tick.
+		 */
+		frameTick: 0,
+		
+		/**
+		 * Current frame index.
+		 */
+		frameIndex: 0,
+		
+		/**
+		 * Current playing animation.
+		 */
+		animation: 'idle',
+		
+		/**
+		 * Play given animation.
+		 */
+		play: function(animation, restart) {
+			if(animation === this.animation && !restart) {
+				return;
+			}
+			
+			// reset animation frame counters
+			this.frameTick = this.frameIndex = 0;
+			
+			// set animation
+			this.animation = animation;
+			
+			// animation start signal
+			this.emitSignal('animationStart', this.animation);
+		},
+		
+		/**
+		 * Updates animation frame.
+		 */
+		update: function(delta) {
+			// inherited super method call
+			BBQ.Actor.prototype.update.call(this, delta);
+			
+			// fetch for animation
+			var animation = this.animation;
+			if(typeof animation === 'string') {
+				animation = this.animations[animation];
+			}
+			
+			// animation requires animation object
+			if(typeof animation !== 'object') {
+				return;
+			}
+			
+			// continue animation frame
+			this.frameTick += (delta * animation.frames.length) / animation.time;
+			if(this.frameTick >= animation.frames.length) {
+				this.frameTick -= animation.frames.length;
+				
+				// animation end signal
+				this.emitSignal('animationEnd', this.animation);
+				
+				// set next animation
+				if(animation.next) {
+					this.play(animation.next);
+				}
+			}
+			
+			// determine frame index
+			this.frameIndex = animation.frames[Math.floor(this.frameTick)];
 		}
 	});
 	
@@ -212,17 +351,29 @@
 	
 	// extends BBQ.ParallaxBackground by PIXI.Container
 	BBQ.Utils.extends(BBQ.ParallaxBackground, PIXI.Container, {
-		addBackground: function(texture, options) {
+		/**
+		 * Appends new parallax background layer.
+		 * 
+		 * @param {Image|String} image Image DOM instance or the image name.
+		 * @param {Object} options Common parallax background options.
+		 * @returns {PIXI.DisplayObject}
+		 */
+		addBackground: function(image, options) {
 			options = BBQ.Utils.assign({
 				htiled: true,
 				vtiled: true
 			}, options);
 			
+			// find image by name
+			if(typeof image === 'string') {
+				image = Game.app.images[image];
+			}
+			
 			// create bg instance
 			var bg = new PIXI.extras.TilingSprite(
-				texture,
-				options.htiled ? this.camera.renderer.width : texture.width,
-				options.vtiled ? this.camera.renderer.height : texture.height
+				Game.app.tex(image),
+				options.htiled ? this.camera.renderer.width : image.width,
+				options.vtiled ? this.camera.renderer.height : image.height
 			);
 			
 			// parallax background settings
@@ -233,7 +384,7 @@
 			bg.htiled = options.htiled;
 			bg.vtiled = options.vtiled;
 			
-			// append background
+			// append background as parallax layer
 			return this.addChild(bg);
 		},
 		
@@ -253,7 +404,7 @@
 				}
 				else {
 					// re-position background by offset
-					bg.position.x = bg.parallaxOffset.x - bg.width / 2;
+					bg.position.x = bg.parallaxOffset.x - camera.renderer.width / 2;
 					// apply parallax offsets
 					bg.position.x += camera.x * bg.parallaxScale.x;
 				}
@@ -271,7 +422,7 @@
 				}
 				else {
 					// re-position background by offset
-					bg.position.y = bg.parallaxOffset.y + camera.renderer.height / 2 - bg.height / 2;
+					bg.position.y = bg.parallaxOffset.y + camera.renderer.height / 2;
 					// apply parallax offsets
 					bg.position.y += camera.y * bg.parallaxScale.y;
 				}

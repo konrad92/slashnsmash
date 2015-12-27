@@ -168,7 +168,7 @@
 		 */
 		log: function(value) {
 			_super.log.apply(this, arguments);
-			BBQ.console.log(value.toString());
+			BBQ.console.log('' + value);
 		},
 		
 		/**
@@ -179,7 +179,7 @@
 		 */
 		info: function(value) {
 			_super.info.apply(this, arguments);
-			BBQ.console.log(value.toString()).style.color = '#c0c0ff';
+			BBQ.console.log('' + value).style.color = '#c0c0ff';
 		},
 		
 		/**
@@ -190,7 +190,7 @@
 		 */
 		warn: function(value) {
 			_super.warn.apply(this, arguments);
-			BBQ.console.log(value.toString()).style.color = '#ffff80';
+			BBQ.console.log('' + value).style.color = '#ffff80';
 		},
 		
 		/**
@@ -201,7 +201,7 @@
 		 */
 		error: function(value) {
 			_super.error.apply(this, arguments);
-			BBQ.console.log(value.toString()).style.color = '#f03030';
+			BBQ.console.log('' + value).style.color = '#f03030';
 		}
 	});
 })(window.BBQ = window.BBQ || {});

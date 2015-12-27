@@ -99,16 +99,30 @@
 		},
 		
 		/**
-		 * Makes texture from image.
+		 * Creates texture from image.
+		 * Uses shared texture instance by default.
 		 * 
-		 * @param {Image|String} image Image instance or image name.
+		 * @param {Image|String} image Image JS instance or image name.
+		 * @param {Boolean} shared Use shared (cached) texture instance.
 		 * @returns {PIXI.Texture} Pixi texture instance.
 		 */
-		tex: function(image) {
+		tex: function(image, shared) {
+			var imageInst = image;
 			if(typeof image === 'string') {
-				image = this.images[image];
+				imageInst = this.images[image];
 			}
-			return PIXI.Texture.fromImage(image.src);
+			if(!(imageInst instanceof Image)) {
+				console.error('Image \'' + image + '\' not recognized', imageInst);
+				return null;
+			}
+			// create shared texture
+			if(typeof shared === 'undefined' || shared === true) {
+				return PIXI.Texture.fromImage(imageInst.src);
+			}
+			// create new texture *with shared base texture
+			return new PIXI.Texture(
+				PIXI.BaseTexture.fromImage(imageInst.src)
+			);
 		},
 		
 		/**
