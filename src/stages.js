@@ -46,10 +46,20 @@
 			});
 			
 			var chara = new Game.Actors.Character('fatguy');
-			chara.position.x = 60;
+			chara.position.x = 40;
 			this.actors.addChild(chara);
 			this.camera.follow(chara);
 			this.players.push(chara);
+			
+			/**
+			 * Create our pet.
+			 */
+			
+			var cat = new Game.Creatures.Cat('white-cat');
+			cat.position.x = 25;
+			cat.position.y = 5;
+			this.actors.addChild(cat);
+			this.players.push(cat);
 			
 			var spr = new BBQ.Actor(Game.app.tex('fatguy'));
 			spr.position.x = 60;
