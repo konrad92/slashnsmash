@@ -58,10 +58,6 @@
 		};
 		
 		this.velocity = new PIXI.Point();
-		
-		// bind events signals
-		this.bindSignal('keydown', this.keydown);
-		this.bindSignal('keyup', this.keyup);
 	};
 	
 	// extends from BBQ.Creatures class
@@ -77,7 +73,7 @@
 			walk: {
 				time: 0.5,
 				frames: [0, 1, 0, 2]
-			},
+			}//,
 			//attack: {
 			//	time: 0.7,
 			//	frames: [0, 1, 0, 2]
@@ -102,6 +98,29 @@
 			this.position.y = Math.min(70, Math.max(0,
 				this.position.y + this.velocity.y * 25 * delta
 			));
+			
+			console.log("Player(" + this.follow.position.x + ", " + this.follow.position.y + ")");
+			console.log("Player(" + this.position.x + ", " + this.position.y + ")");
+			
+			if(this.distanceFromPlayer() > 20) 
+			{
+				// reset velocity
+				this.velocity.x = 1;
+				this.velocity.y = 0;
+			}
+		},
+		
+		/**
+		 * Distance from the players.
+		 */
+		
+		distanceFromPlayer: function() {
+			var xx1 = Math.pow(((parseFloat(this.position.x)) - (parseFloat(this.follow.position.x))), 2);
+			var yy1 = Math.pow(((parseFloat(this.position.y)) - (parseFloat(this.follow.position.y))), 2);
+			var result = (Math.sqrt(xx1 + yy1)); 
+			console.log("Odleglosc miedzy graczem a kotem: " + result)
+			
+			return result;
 		},
 		
 		/**
@@ -120,86 +139,19 @@
 		updateState: function(delta) {
 			var animation = 'idle';
 			
-			// reset velocity
-			this.velocity.x = 0;
-			this.velocity.y = 0;
-			
-			// move horizontal
-			if(this.state.move.right) {
+			if(this.distanceFromPlayer() > 20) 
+			{
 				this.velocity.x = 1;
-				this.scale.x = 1;
-				animation = 'walk';
+				//this.velocity.y = 0;
+				var animation = 'walk';
+			} else {
+				// reset velocity
+				this.velocity.x = 0;
+				this.velocity.y = 0;
 			}
-			else if(this.state.move.left) {
-				this.velocity.x = -1;
-				this.scale.x = -1;
-				animation = 'walk';
-			}
-			
-			// move vertical
-			if(this.state.move.down) {
-				this.velocity.y = 1;
-				animation = 'walk';
-			}
-			else if(this.state.move.up) {
-				this.velocity.y = -1;
-				animation = 'walk';
-			}
-			
-			if(this.state.move.q) {
-				this.velocity.y = -1;
-				animation = 'walk';
-			} else if(this.state.move.a) {
-				this.velocity.y = 1;
-				animation = 'walk';
-			}
-			
+
 			// play animation
 			this.play(animation);
-		},
-		
-		keydown: function(key, e) {
-			// movement keys
-			if(key === 'right') {
-				this.state.move.right = true;
-			}
-			else if(key === 'left') {
-				this.state.move.left = true;
-			}
-			else if(key === 'down') {
-				this.state.move.down = true;
-			}
-			else if(key === 'up') {
-				this.state.move.up = true;
-			}
-			else if(key === 'q') {
-				this.state.move.q = true;
-			}
-			else if(key === 'a') {
-				this.state.move.a = true;
-			}
-		},
-		
-		keyup: function(key, e) {
-			// movement keys
-			if(key === 'right') {
-				this.state.move.right = false;
-			}
-			else if(key === 'left') {
-				this.state.move.left = false;
-			}
-			else if(key === 'down') {
-				this.state.move.down = false;
-			}
-			else if(key === 'up') {
-				this.state.move.up = false;
-			}
-			else if(key === 'q') {
-				this.state.move.q = false;
-			}
-			else if(key === 'a') {
-				this.state.move.a = false;
-			}
 		}
 	});
 	

@@ -56,11 +56,12 @@
 			 */
 			
 			var cat = new Game.Creatures.Cat('white-cat');
-			cat.position.x = 25;
-			cat.position.y = 5;
+			cat.position.x = 15;
+			cat.position.y = 15;
 			this.actors.addChild(cat);
-			this.players.push(cat);
 			
+			cat.follow = chara;
+				
 			var spr = new BBQ.Actor(Game.app.tex('fatguy'));
 			spr.position.x = 60;
 			spr.position.y = 50;
