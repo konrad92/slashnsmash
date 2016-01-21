@@ -99,29 +99,24 @@
 				this.position.y + this.velocity.y * 25 * delta
 			));
 			
-			console.log("Player(" + this.follow.position.x + ", " + this.follow.position.y + ")");
-			console.log("Player(" + this.position.x + ", " + this.position.y + ")");
+			//console.log("Player(" + this.follow.position.x + ", " + this.follow.position.y + ")");
+			//console.log("Player(" + this.position.x + ", " + this.position.y + ")");
 			
-			if(this.distanceFromPlayer() > 20) 
-			{
-				// reset velocity
-				this.velocity.x = 1;
-				this.velocity.y = 0;
-			}
 		},
-		
-		/**
+		/*
+		*//**
 		 * Distance from the players.
-		 */
+		 *//*
 		
 		distanceFromPlayer: function() {
 			var xx1 = Math.pow(((parseFloat(this.position.x)) - (parseFloat(this.follow.position.x))), 2);
 			var yy1 = Math.pow(((parseFloat(this.position.y)) - (parseFloat(this.follow.position.y))), 2);
 			var result = (Math.sqrt(xx1 + yy1)); 
+			
 			console.log("Odleglosc miedzy graczem a kotem: " + result)
 			
 			return result;
-		},
+		},*/
 		
 		/**
 		 * Updates animation frame by texture cropping.
@@ -138,42 +133,45 @@
 		 */
 		updateState: function(delta) {
 			var animation = 'idle';
-			
-			if(this.distanceFromPlayer() > 25) {
-				var animation = 'walk';
-				
-				if(Math.abs(this.position.x - this.follow.position.x) > 20) {
-					if(this.position.x > this.follow.position.x) {
-						this.velocity.x = -1;
-						
-						// dodać obrócenie się kotka
-						
-						if(Math.abs(this.position.y - this.follow.position.y) > 10) {
-							if(this.position.y > this.follow.position.y) {
-								this.velocity.y = -1;
-							} else {
-								this.velocity.y = 1;
-							}
+
+			if(Math.abs(this.position.x - this.follow.position.x) > 15) {
+				animation = 'walk';
+				if(this.follow.position.x > this.position.x) {
+					this.velocity.x = 1;
+					if(Math.abs(this.position.y - this.follow.position.y) > 10) {
+						if(this.follow.position.y > this.position.y) {
+							this.velocity.y = 1;
 						} else {
-							this.velocity.y = 0;
+							this.velocity.y = -1;
 						}
 					} else {
-						this.velocity.x = 1;
-						if(Math.abs(this.position.y - this.follow.position.y) > 10) {
-							if(this.position.y > this.follow.position.y) {
-								this.velocity.y = -1;
-							} else {
-								this.velocity.y = 1;
-							}
+						this.velocity.y = 0;
+					}
+				} else {
+					this.velocity.x = -1;
+					if(Math.abs(this.position.y - this.follow.position.y) > 10) {
+						if(this.follow.position.y > this.position.y) {
+							this.velocity.y = 1;
 						} else {
-							this.velocity.y = 0;
-						}
+							this.velocity.y = -1;
+						} 
+					} else {
+						this.velocity.y = 0;
 					}
 				}
 			} else {
-				// reset velocity
+				animation = 'idle';
 				this.velocity.x = 0;
-				this.velocity.y = 0;
+				if(Math.abs(this.position.y - this.follow.position.y) > 10) {
+					animation = 'walk';
+					if(this.follow.position.y > this.position.y) {
+						this.velocity.y = 1;
+					} else {
+						this.velocity.y = -1;
+					}
+				} else {
+					this.velocity.y = 0;
+				}
 			}
 
 			// play animation
