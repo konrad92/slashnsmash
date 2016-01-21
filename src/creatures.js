@@ -139,11 +139,37 @@
 		updateState: function(delta) {
 			var animation = 'idle';
 			
-			if(this.distanceFromPlayer() > 20) 
-			{
-				this.velocity.x = 1;
-				//this.velocity.y = 0;
+			if(this.distanceFromPlayer() > 25) {
 				var animation = 'walk';
+				
+				if(Math.abs(this.position.x - this.follow.position.x) > 20) {
+					if(this.position.x > this.follow.position.x) {
+						this.velocity.x = -1;
+						
+						// dodać obrócenie się kotka
+						
+						if(Math.abs(this.position.y - this.follow.position.y) > 10) {
+							if(this.position.y > this.follow.position.y) {
+								this.velocity.y = -1;
+							} else {
+								this.velocity.y = 1;
+							}
+						} else {
+							this.velocity.y = 0;
+						}
+					} else {
+						this.velocity.x = 1;
+						if(Math.abs(this.position.y - this.follow.position.y) > 10) {
+							if(this.position.y > this.follow.position.y) {
+								this.velocity.y = -1;
+							} else {
+								this.velocity.y = 1;
+							}
+						} else {
+							this.velocity.y = 0;
+						}
+					}
+				}
 			} else {
 				// reset velocity
 				this.velocity.x = 0;
