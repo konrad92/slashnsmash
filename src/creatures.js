@@ -135,14 +135,48 @@
 		 */
 		updateState: function(delta) {
 			var animation = 'idle';
-			
-			if(this.have == 1) {	
-				if(Math.abs(this.position.x - this.follow.position.x) > 15) {
-					this.scale.x = 1;
-					animation = 'walk';
-					if(this.follow.position.x > this.position.x) {
-						this.velocity.x = 1;
+
+			    this.velocity.x = -1;
+				this.scale.x = -1;
+				animation = 'walk';
+					
+				if(this.position.x >= this.follow.position.x && (Math.abs(this.position.y - this.follow.position.y) < 15)) {
+					this.have = 1;
+				}
+				if (this.have == 1)	{
+				    if(Math.abs(this.position.x - this.follow.position.x) > 15) {
+						this.scale.x = 1;
+						animation = 'walk';
+						if(this.follow.position.x > this.position.x) {
+							this.velocity.x = 1;
+							if(Math.abs(this.position.y - this.follow.position.y) > 10) {
+								if(this.follow.position.y > this.position.y) {
+									this.velocity.y = 1;
+								} else {
+									this.velocity.y = -1;
+								}
+							} else {
+								this.velocity.y = 0;
+							}
+						} else {
+							this.velocity.x = -1;
+							this.scale.x = -1;
+							// zmiana kierunku ruchu sprite
+							if(Math.abs(this.position.y - this.follow.position.y) > 10) {
+								if(this.follow.position.y > this.position.y) {
+									this.velocity.y = 1;
+								} else {
+									this.velocity.y = -1;
+								} 
+							} else {
+								this.velocity.y = 0;
+							}
+						}
+					} else {
+						animation = 'idle';
+						this.velocity.x = 0;
 						if(Math.abs(this.position.y - this.follow.position.y) > 10) {
+							animation = 'walk';
 							if(this.follow.position.y > this.position.y) {
 								this.velocity.y = 1;
 							} else {
@@ -151,46 +185,10 @@
 						} else {
 							this.velocity.y = 0;
 						}
-					} else {
-						this.velocity.x = -1;
-						this.scale.x = -1;
-						// zmiana kierunku ruchu sprite
-						if(Math.abs(this.position.y - this.follow.position.y) > 10) {
-							if(this.follow.position.y > this.position.y) {
-								this.velocity.y = 1;
-							} else {
-								this.velocity.y = -1;
-							} 
-						} else {
-							this.velocity.y = 0;
-						}
 					}
-				} else {
-					animation = 'idle';
-					this.velocity.x = 0;
-					if(Math.abs(this.position.y - this.follow.position.y) > 10) {
-						animation = 'walk';
-						if(this.follow.position.y > this.position.y) {
-							this.velocity.y = 1;
-						} else {
-							this.velocity.y = -1;
-						}
-					} else {
-						this.velocity.y = 0;
-					}
-				}
-			} else {		
-				this.velocity.x = -1;
-				this.scale.x = -1;
-				animation = 'walk';
-				
-				if(this.follow.position.y-100 < this.position.y < this.follow.position.y+100) {
-					if(this.follow.position.x-10 < this.position.x < this.follow.position.x+10) {
-						this.have = 1;
-						this.velocity.y = 0;
-					}
-				}
-			}
+				} 
+			
+			
 			
 			// play animation
 			this.play(animation);
@@ -201,6 +199,6 @@
 	 * Preload assets.
 	 */
 	Game.Creatures.Cat.preload = function(app) {
-		app.loadImages('shadow', 'white-cat');
+		app.loadImages('shadow', 'red-cat', 'white-cat');
 	};
 })(window.Game = window.Game || {}, BBQ, PIXI);
