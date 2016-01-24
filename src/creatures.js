@@ -58,6 +58,8 @@
 		};
 		
 		this.velocity = new PIXI.Point();
+		
+		this.have = 0;
 	};
 	
 	// extends from BBQ.Creatures class
@@ -103,10 +105,10 @@
 			//console.log("Player(" + this.position.x + ", " + this.position.y + ")");
 			
 		},
-		/*
-		*//**
+		
+		/**
 		 * Distance from the players.
-		 *//*
+		 */
 		
 		distanceFromPlayer: function() {
 			var xx1 = Math.pow(((parseFloat(this.position.x)) - (parseFloat(this.follow.position.x))), 2);
@@ -115,8 +117,8 @@
 			
 			console.log("Odleglosc miedzy graczem a kotem: " + result)
 			
-			return result;
-		},*/
+			//return result;
+		},
 		
 		/**
 		 * Updates animation frame by texture cropping.
@@ -133,12 +135,41 @@
 		 */
 		updateState: function(delta) {
 			var animation = 'idle';
-
-			if(Math.abs(this.position.x - this.follow.position.x) > 15) {
-				animation = 'walk';
-				if(this.follow.position.x > this.position.x) {
-					this.velocity.x = 1;
+			
+			if(this.have == 1) {	
+				if(Math.abs(this.position.x - this.follow.position.x) > 15) {
+					this.scale.x = 1;
+					animation = 'walk';
+					if(this.follow.position.x > this.position.x) {
+						this.velocity.x = 1;
+						if(Math.abs(this.position.y - this.follow.position.y) > 10) {
+							if(this.follow.position.y > this.position.y) {
+								this.velocity.y = 1;
+							} else {
+								this.velocity.y = -1;
+							}
+						} else {
+							this.velocity.y = 0;
+						}
+					} else {
+						this.velocity.x = -1;
+						this.scale.x = -1;
+						// zmiana kierunku ruchu sprite
+						if(Math.abs(this.position.y - this.follow.position.y) > 10) {
+							if(this.follow.position.y > this.position.y) {
+								this.velocity.y = 1;
+							} else {
+								this.velocity.y = -1;
+							} 
+						} else {
+							this.velocity.y = 0;
+						}
+					}
+				} else {
+					animation = 'idle';
+					this.velocity.x = 0;
 					if(Math.abs(this.position.y - this.follow.position.y) > 10) {
+						animation = 'walk';
 						if(this.follow.position.y > this.position.y) {
 							this.velocity.y = 1;
 						} else {
@@ -147,33 +178,20 @@
 					} else {
 						this.velocity.y = 0;
 					}
-				} else {
-					this.velocity.x = -1;
-					if(Math.abs(this.position.y - this.follow.position.y) > 10) {
-						if(this.follow.position.y > this.position.y) {
-							this.velocity.y = 1;
-						} else {
-							this.velocity.y = -1;
-						} 
-					} else {
+				}
+			} else {		
+				this.velocity.x = -1;
+				this.scale.x = -1;
+				animation = 'walk';
+				
+				if(this.follow.position.y-100 < this.position.y < this.follow.position.y+100) {
+					if(this.follow.position.x-10 < this.position.x < this.follow.position.x+10) {
+						this.have = 1;
 						this.velocity.y = 0;
 					}
 				}
-			} else {
-				animation = 'idle';
-				this.velocity.x = 0;
-				if(Math.abs(this.position.y - this.follow.position.y) > 10) {
-					animation = 'walk';
-					if(this.follow.position.y > this.position.y) {
-						this.velocity.y = 1;
-					} else {
-						this.velocity.y = -1;
-					}
-				} else {
-					this.velocity.y = 0;
-				}
 			}
-
+			
 			// play animation
 			this.play(animation);
 		}
