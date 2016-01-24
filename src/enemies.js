@@ -1,7 +1,7 @@
 /*
- * creatures.js
+ * enemies.js
  * 
- * Creatures. Animals
+ * Enemies
  * 
  * Licensed under MIT license.
  * For license details please check the LICENSE file of the project.
@@ -10,7 +10,7 @@
  */
 
 /**
- * Creatures and animals objects.
+ * Enemies objects.
  * 
  * @param {Object} Game Common public game namespace.
  * @param {Object} BBQ Engine public namespace.
@@ -21,14 +21,14 @@
 	"use strict";
 	
 	/**
-	 * Creatures and animals.
+	 * Enemies.
 	 */
-	Game.Creatures = {};
+	Game.Enemies = {};
 	
 	/**
 	 * First stage - Evil Town.
 	 */
-	Game.Creatures.Cat = function(image) {
+	Game.Enemies.Enemy = function(image) {
 		// inherited ctor
 		BBQ.AnimatedActor.call(this);
 		
@@ -59,11 +59,11 @@
 		
 		this.velocity = new PIXI.Point();
 		
-		this.have = 0;
+		//this.seeYou = 0;
 	};
 	
-	// extends from BBQ.Creatures class
-	BBQ.Utils.extends(Game.Creatures.Cat, BBQ.AnimatedActor, {
+	// extends from BBQ.Enemies class
+	BBQ.Utils.extends(Game.Enemies.Enemy, BBQ.AnimatedActor, {
 		/**
 		 * Animation frames to use.
 		 */
@@ -75,11 +75,11 @@
 			walk: {
 				time: 0.5,
 				frames: [0, 1, 0, 2]
-			}//,
-			//attack: {
-			//	time: 0.7,
-			//	frames: [0, 1, 0, 2]
-			//},
+			},
+			attack: {
+				time: 0.5,
+				frames: [6, 7, 8]
+			}
 		},
 		
 		/**
@@ -101,9 +101,6 @@
 				this.position.y + this.velocity.y * 22 * delta
 			));
 			
-			//console.log("Player(" + this.follow.position.x + ", " + this.follow.position.y + ")");
-			//console.log("Player(" + this.position.x + ", " + this.position.y + ")");
-			
 		},
 		
 		/**
@@ -117,7 +114,7 @@
 			
 			console.log("Odleglosc miedzy graczem a kotem: " + result)
 			
-			//return result;
+			return result;
 		},
 		
 		/**
@@ -134,63 +131,51 @@
 		 * 
 		 */
 		updateState: function(delta) {
+			
 			var animation = 'idle';
-
-			    this.velocity.x = -1;
-				this.scale.x = -1;
-				animation = 'walk';
+			
+			animation = 'walk';
+			if((this.position.x - this.follow.position.x) < 70) {
+				if(this.position.y > this.follow.position.y) {
+					this.velocity.y = -1;
+					this.scale.x = -1;
 					
-				if(this.position.x >= this.follow.position.x && (Math.abs(this.position.y - this.follow.position.y) < 15)) {
-					this.have = 1;
-				}
-				if (this.have == 1)	{
-				    if(Math.abs(this.position.x - this.follow.position.x) > 15) {
-						this.scale.x = 1;
-						animation = 'walk';
-						if((this.follow.position.x > this.position.x) && this.have == 1) {
-							this.velocity.x = 1;
-							this.scale.x = 1;
-							if(Math.abs(this.position.y - this.follow.position.y) > 10) {
-								if((this.follow.position.y > this.position.y) && this.have == 1) {
-									this.velocity.y = 1;
-								} else {
-									this.velocity.y = -1;
-								}
-							} else {
-								this.velocity.y = 0;
-							}
-						} else {
-							this.velocity.x = -1;
-							this.scale.x = -1;
-							// zmiana kierunku ruchu sprite
-							if(Math.abs((this.position.y - this.follow.position.y) && this.have == 1) > 10) {
-								if((this.follow.position.y > this.position.y) && this.have == 1) {
-									this.velocity.y = 1;
-								} else {
-									this.velocity.y = -1;
-								} 
-							} else {
-								this.velocity.y = 0;
-							}
-						}
+					if(this.position.x > this.follow.position.x) {
+						this.velocity.x = -1;
 					} else {
-						animation = 'idle';
-						this.velocity.x = 0;
+						this.velocity.x = 1;
 						this.scale.x = 1;
-						if(Math.abs(this.position.y - this.follow.position.y) > 10) {
-							animation = 'walk';
-							if((this.follow.position.y > this.position.y) && this.have == 1) {
-								this.velocity.y = 1;
-							} else {
-								this.velocity.y = -1;
-							}
-						} else {
-							this.velocity.y = 0;
-						}
 					}
-				} 
+				} else {
+					this.velocity.y = 1;
+					this.scale.x = -1;
+					
+					if(this.position.x > this.follow.position.x) {
+						this.velocity.x = -1;
+					} else {
+						this.velocity.x = 1;
+						this.scale.x = 1;
+					}
+				}
+			} else {
+				if(this.position.x > this.follow.position.x) {
+					this.velocity.x = -1;
+					this.scale.x = -1;
+				} else {
+					this.velocity.x = 1;
+					this.scale.x = 1;
+				}
+			}
 			
-			
+			if(Math.abs(this.position.x - this.follow.position.x) <= 15 && Math.abs(this.position.y - this.follow.position.y) <= 25) {
+				this.velocity.x = 0;
+				animation = 'attack';	
+				if(this.position.y > this.follow.position.y) {
+					this.velocity.y = -1;
+				} else {
+					this.velocity.y = 1;
+				}
+			}
 			
 			// play animation
 			this.play(animation);
@@ -200,7 +185,7 @@
 	/**
 	 * Preload assets.
 	 */
-	Game.Creatures.Cat.preload = function(app) {
-		app.loadImages('shadow', 'red-cat', 'white-cat');
+	Game.Enemies.Enemy.preload = function(app) {
+		app.loadImages('shadow', 'red-cat');
 	};
 })(window.Game = window.Game || {}, BBQ, PIXI);

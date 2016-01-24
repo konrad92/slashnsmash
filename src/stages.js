@@ -46,7 +46,8 @@
 			});
 			
 			var chara = new Game.Actors.Character('fatguy');
-			chara.position.x = 40;
+			chara.position.x = 60;
+			chara.position.y = 60;
 			this.actors.addChild(chara);
 			this.camera.follow(chara);
 			this.players.push(chara);
@@ -63,20 +64,30 @@
 			cat.follow = chara;
 			chara.weapon = cat;
 			
-			var catR = new Game.Creatures.Cat('red-cat');
-			catR.position.x = 200;
-			catR.position.y = 15;
-			this.actors.addChild(catR);
+			/**
+			 * Create enemies.
+			 */
 			
-			catR.follow = chara;
-			chara.weapon = catR;
+			var enemy1 = new Game.Enemies.Enemy('red-cat');
+			enemy1.position.x = 300;
+			enemy1.position.y = 15;
+			this.actors.addChild(enemy1);
 			
-			var spr = new BBQ.Actor(Game.app.tex('fatguy'));
-			spr.position.x = 60;
-			spr.position.y = 50;
-			spr.anchor.x = 0.5;
-			spr.anchor.y = 1;
-			this.actors.addChild(spr);
+			enemy1.follow = chara;
+			
+			var enemy2 = new Game.Enemies.Enemy('red-cat');
+			enemy2.position.x = 500;
+			enemy2.position.y = 35;
+			this.actors.addChild(enemy2);
+			
+			enemy2.follow = chara;
+			
+			var enemy3 = new Game.Enemies.Enemy('red-cat');
+			enemy3.position.x = 800;
+			enemy3.position.y = 15;
+			this.actors.addChild(enemy3);
+			
+			enemy3.follow = chara;
 		},
 		
 		keydown: function(e) {
