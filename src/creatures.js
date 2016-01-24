@@ -107,20 +107,6 @@
 		},
 		
 		/**
-		 * Distance from the players.
-		 */
-		
-		distanceFromPlayer: function() {
-			var xx1 = Math.pow(((parseFloat(this.position.x)) - (parseFloat(this.follow.position.x))), 2);
-			var yy1 = Math.pow(((parseFloat(this.position.y)) - (parseFloat(this.follow.position.y))), 2);
-			var result = (Math.sqrt(xx1 + yy1)); 
-			
-			console.log("Odleglosc miedzy graczem a kotem: " + result)
-			
-			//return result;
-		},
-		
-		/**
 		 * Updates animation frame by texture cropping.
 		 */
 		updateAnimFrame: function() {

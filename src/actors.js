@@ -60,6 +60,11 @@
 		
 		this.velocity = new PIXI.Point();
 		
+		this.health = 100;
+		this.healthMax = 100;
+		this.damageHP = 15;
+		this.isDead = false;
+		
 		// bind events signals
 		this.bindSignal('keydown', this.keydown);
 		this.bindSignal('keyup', this.keyup);
@@ -83,6 +88,10 @@
 				time: .5,
 				frames: [2],
 				next: 'idle'
+			},
+			hit: {
+				time: 0.5,
+				frames: [0, 2, 0, 2],
 			}
 		},
 		
@@ -161,6 +170,35 @@
 			this.play(animation);
 		},
 		
+		/**
+		 * Distance from the players.
+		 */
+		
+		distance: function() {
+			var xx1 = Math.pow(((parseFloat(this.position.x)) - (parseFloat(this.inter.position.x))), 2);
+			var yy1 = Math.pow(((parseFloat(this.position.y)) - (parseFloat(this.inter.position.y))), 2);
+			var result = (Math.sqrt(xx1 + yy1)); 
+			
+			return result;
+		},
+			
+		damage: function(pkt) {
+			if(this.inter.health > 0) {
+				this.inter.health -= pkt;		
+				console.log("HP STWORKA: " + this.inter.health + "/" + this.inter.healthMax);
+			}
+		},
+		
+		collisionObj: function() {
+			if(this.distance() < 10) {
+				animation = 'hit';	
+				
+				//this.delay('1000');
+				//setTimeout(this.damage('10'), 1000);
+				this.damage(this.damageHP);
+			}
+		},
+		
 		keydown: function(key, e) {
 			// movement keys
 			if(key === 'right') {
@@ -179,6 +217,15 @@
 			if(key === 'c') {
 				this.play('jump');
 			}
+			
+			// hit
+			if(key === 'i') {
+				//this.weapon.velocity.x = 1;
+				//this.weapon.scale.x = -1;
+				//this.weapon.distanceFromPlayer();
+				this.collisionObj();
+				
+			}
 		},
 		
 		keyup: function(key, e) {
@@ -194,6 +241,11 @@
 			}
 			else if(key === 'up') {
 				this.state.move.up = false;
+			}
+			
+			// hit
+			if(key === 'i') {
+				//this.weapon.scale.x = 1;
 			}
 		}
 	});

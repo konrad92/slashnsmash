@@ -57,9 +57,11 @@
 			move: {}
 		};
 		
-		this.velocity = new PIXI.Point();
+		this.health = 50;
+		this.healthMax = 50;
+		this.damageHP = 5;
 		
-		//this.seeYou = 0;
+		this.velocity = new PIXI.Point();
 	};
 	
 	// extends from BBQ.Enemies class
@@ -104,20 +106,6 @@
 		},
 		
 		/**
-		 * Distance from the players.
-		 */
-		
-		distanceFromPlayer: function() {
-			var xx1 = Math.pow(((parseFloat(this.position.x)) - (parseFloat(this.follow.position.x))), 2);
-			var yy1 = Math.pow(((parseFloat(this.position.y)) - (parseFloat(this.follow.position.y))), 2);
-			var result = (Math.sqrt(xx1 + yy1)); 
-			
-			console.log("Odleglosc miedzy graczem a kotem: " + result)
-			
-			return result;
-		},
-		
-		/**
 		 * Updates animation frame by texture cropping.
 		 */
 		updateAnimFrame: function() {
@@ -125,6 +113,28 @@
 			this.body.texture.crop.x = Math.floor(this.frameIndex % 3) * this.frameSize.width;
 			this.body.texture.crop.y = Math.floor(this.frameIndex / 3) *this.frameSize.height;
 			this.body.texture._updateUvs();
+		},
+		
+		delay: function(ms) {
+			var date	= new Date();
+			var curDate = null;
+		 
+			do {
+				curDate = new Date();
+			} while(curDate-date < ms);
+		},
+		
+		damage: function(pkt) {
+			this.delay('100');
+			if(this.follow.health > 0) {
+				this.follow.health -= pkt;		
+				this.follow.position.x += 10;
+				this.follow.position.y += 10;
+				
+				this.position.x -= 10;
+				this.position.y += 10;
+				console.log("HP: " + this.follow.health + "/" + this.follow.healthMax);
+			}
 		},
 		
 		/**
@@ -170,6 +180,11 @@
 			if(Math.abs(this.position.x - this.follow.position.x) <= 15 && Math.abs(this.position.y - this.follow.position.y) <= 25) {
 				this.velocity.x = 0;
 				animation = 'attack';	
+				
+				//this.delay('1000');
+				//setTimeout(this.damage('10'), 1000);
+				this.damage(this.damageHP);
+				
 				if(this.position.y > this.follow.position.y) {
 					this.velocity.y = -1;
 				} else {

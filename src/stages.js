@@ -74,6 +74,7 @@
 			this.actors.addChild(enemy1);
 			
 			enemy1.follow = chara;
+			chara.inter = enemy1;
 			
 			var enemy2 = new Game.Enemies.Enemy('red-cat');
 			enemy2.position.x = 500;
