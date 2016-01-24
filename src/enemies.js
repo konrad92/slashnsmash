@@ -134,6 +134,9 @@
 				this.position.x -= 10;
 				this.position.y += 10;
 				console.log("HP: " + this.follow.health + "/" + this.follow.healthMax);
+			} else {
+				this.follow.isDead = true;
+				// KONIEC GRY
 			}
 		},
 		
