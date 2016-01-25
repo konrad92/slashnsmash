@@ -115,28 +115,17 @@
 			this.body.texture._updateUvs();
 		},
 		
-		delay: function(ms) {
-			var date	= new Date();
-			var curDate = null;
-		 
-			do {
-				curDate = new Date();
-			} while(curDate-date < ms);
-		},
-		
 		damage: function(pkt) {
-			this.delay('100');
 			if(this.follow.health > 0) {
-				this.follow.health -= pkt;		
-				this.follow.position.x += 10;
-				this.follow.position.y += 10;
+				this.follow.health -= pkt;	
 				
-				this.position.x -= 10;
-				this.position.y += 10;
+				this.follow.position.x -= 2;
+				this.follow.position.y -= 2;
+
 				console.log("HP: " + this.follow.health + "/" + this.follow.healthMax);
 			} else {
 				this.follow.isDead = true;
-				// KONIEC GRY
+				// KONIEC GRY jak zginiemy
 			}
 		},
 		
@@ -182,10 +171,7 @@
 			
 			if(Math.abs(this.position.x - this.follow.position.x) <= 15 && Math.abs(this.position.y - this.follow.position.y) <= 25) {
 				this.velocity.x = 0;
-				animation = 'attack';	
-				
-				//this.delay('1000');
-				//setTimeout(this.damage('10'), 1000);
+				animation = 'attack';					
 				this.damage(this.damageHP);
 				
 				if(this.position.y > this.follow.position.y) {
