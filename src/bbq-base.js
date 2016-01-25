@@ -41,6 +41,7 @@
 		 * Extends classes between prototypes.
 		 * Automates constructor reassign.
 		 * 
+		 * @deprecated Functionality deprecated, checkout for BBQ.Class instead
 		 * @param {Function} classa Class to prepare.
 		 * @param {Function} classb Extends from this class.
 		 * @param {Object} proto Prototype new assigns.
@@ -87,6 +88,105 @@
 				}
 			}
 		}
+	};
+	
+	/**
+	 * Class builder utility.
+	 * Simple usage:
+	 * MyClass = Class(function() {
+	 *     // this is my constructor
+	 *     this.foo = 1;
+	 * })
+	 * .extends(ExtendedClass)
+	 * .propeties({
+	 *     // this is my own class property
+	 *     fooprop: {
+	 *         get: function() {
+	 *             return 123;
+	 *         }
+	 *     }
+	 * })
+	 * .scope({
+	 *     // this is my class body
+	 *     bar: function() {
+	 *         return this.foo++;
+	 *     },
+	 *     peek: function() {
+	 *         return this.foo;
+	 *     }
+	 * });
+	 * 
+	 * @return {Function} Class builder.
+	 */
+	window.Class = BBQ.Class = function(ctor) {
+		if(typeof ctor.type === 'undefined') {
+			// store class type
+			ctor.type = ctor;
+			
+			// redefine class prototype
+			ctor.prototype = {
+				constructor: ctor
+			};
+		}
+		
+		/**
+		 * Allows extending class by another one.
+		 * Supports single inheritance.
+		 * Inheritance removes old prototype values.
+		 * 
+		 * @param {Function} extended Class to extend.
+		 * @return {Function} Chaining *this* class builder.
+		 */
+		ctor.extends = function(extended) {
+			if(typeof extended !== 'function') {
+				console.error('Extending class by non-class object is unallowed');
+				return this;
+			}
+			
+			// create class inheritance
+			this.type.prototype = Object.create(extended.prototype);
+			this.type.prototype.constructor = this.type;
+			return this;
+		};
+		
+		/**
+		 * Define properties for class.
+		 * 
+		 * @param {Object} props Properties specified object.
+		 * @return {Function} Chaining *this* class builder.
+		 */
+		ctor.properties = function(props) {
+			Object.defineProperties(this.type.prototype, props);
+			return this;
+		};
+		
+		/**
+		 * Apply scope body to the class prototype.
+		 * 
+		 * @param {Object} scope Scope object to apply as class prototype.
+		 * @return {Function} Chaining *this* class builder.
+		 */
+		ctor.scope = function(scope) {
+			Engine.Utils.assign(this.type.prototype, scope);
+			return this;
+		};
+		
+		/**
+		 * Make class final.
+		 * Disables class builder functionality.
+		 * 
+		 * @return {Function} Chaining *this* without class builder.
+		 */
+		ctor.final = function() {
+			delete this.type.scope;
+			delete this.type.properties;
+			delete this.type.extends;
+			delete this.type.type;
+			return this;
+		};
+		
+		// returns class builder
+		return ctor;
 	};
 	
 	/**
