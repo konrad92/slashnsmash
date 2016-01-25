@@ -96,9 +96,9 @@
 			this.updateState(delta);
 			
 			// update physics
-			this.position.x += this.velocity.x * 22 * delta;
+			this.position.x += this.velocity.x * 25 * delta;
 			this.position.y = Math.min(70, Math.max(0,
-				this.position.y + this.velocity.y * 22 * delta
+				this.position.y + this.velocity.y * 25 * delta
 			));
 			
 			//console.log("Player(" + this.follow.position.x + ", " + this.follow.position.y + ")");
