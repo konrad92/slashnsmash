@@ -45,11 +45,14 @@
 				htiled: true
 			});
 			
-			var chara = new Game.Actors.Character('fatguy');
+			var chara = new Game.Actors.Player('fatguy');
 			chara.position.x = 60;
 			this.actors.addChild(chara);
 			this.camera.follow(chara);
 			this.players.push(chara);
+			
+			var enemy = new Game.Actors.Enemy('enemyguy');
+			this.actors.addChild(enemy);
 			
 			var spr = new BBQ.Actor(Game.app.tex('fatguy'));
 			spr.position.x = 60;
@@ -61,13 +64,13 @@
 		
 		keydown: function(e) {
 			this.players.forEach(function(player) {
-				player.enqueueEvent('keydown', e.key, e);
+				player.enqueueEvent('keyEvent', e.key, true, e);
 			}, this);
 		},
 		
 		keyup: function(e) {
 			this.players.forEach(function(player) {
-				player.enqueueEvent('keyup', e.key, e);
+				player.enqueueEvent('keyEvent', e.key, false, e);
 			}, this);
 		}
 	});

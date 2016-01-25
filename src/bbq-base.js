@@ -167,7 +167,7 @@
 		 * @return {Function} Chaining *this* class builder.
 		 */
 		ctor.scope = function(scope) {
-			Engine.Utils.assign(this.type.prototype, scope);
+			BBQ.Utils.assign(this.type.prototype, scope);
 			return this;
 		};
 		
