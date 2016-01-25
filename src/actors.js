@@ -60,14 +60,8 @@
 		
 		this.velocity = new PIXI.Point();
 		
+		// character basic states
 		this.health = 100;
-		this.healthMax = 100;
-		this.damageHP = 15;
-		this.isDead = false;
-		
-		// bind events signals
-		this.bindSignal('keydown', this.keydown);
-		this.bindSignal('keyup', this.keyup);
 	};
 	
 	// extends from BBQ.Actor class
@@ -88,10 +82,6 @@
 				time: .5,
 				frames: [2],
 				next: 'idle'
-			},
-			hit: {
-				time: 0.5,
-				frames: [0, 2, 0, 2],
 			}
 		},
 		
@@ -111,7 +101,9 @@
 			}
 			
 			// update state
-			this.updateState(delta);
+			if(typeof this.updateState === 'function') {
+				this.updateState(delta); // exec only if exists				
+			}
 			
 			// update physics
 			this.position.x += this.velocity.x * 25 * delta;
@@ -128,125 +120,6 @@
 			this.body.texture.crop.x = Math.floor(this.frameIndex % 3) * this.frameSize.width;
 			this.body.texture.crop.y = Math.floor(this.frameIndex / 3) *this.frameSize.height;
 			this.body.texture._updateUvs();
-		},
-		
-		/**
-		 * 
-		 */
-		updateState: function(delta) {
-			if(this.animation === 'jump') {
-				return;
-			}
-			
-			var animation = 'idle';
-			
-			// reset velocity
-			this.velocity.x = 0;
-			this.velocity.y = 0;
-			
-			// move horizontal
-			if(this.state.move.right) {
-				this.velocity.x = 1;
-				this.scale.x = 1;
-				animation = 'walk';
-			}
-			else if(this.state.move.left) {
-				this.velocity.x = -1;
-				this.scale.x = -1;
-				animation = 'walk';
-			}
-			
-			// move vertical
-			if(this.state.move.down) {
-				this.velocity.y = 1;
-				animation = 'walk';
-			}
-			else if(this.state.move.up) {
-				this.velocity.y = -1;
-				animation = 'walk';
-			}
-			
-			// play animation
-			this.play(animation);
-		},
-		
-		/**
-		 * Distance from the players.
-		 */
-		
-		distance: function() {
-			var xx1 = Math.pow(((parseFloat(this.position.x)) - (parseFloat(this.inter.position.x))), 2);
-			var yy1 = Math.pow(((parseFloat(this.position.y)) - (parseFloat(this.inter.position.y))), 2);
-			var result = (Math.sqrt(xx1 + yy1)); 
-			
-			return result;
-		},
-			
-		damage: function(pkt) {
-			if(this.inter.health > 0) {
-				this.inter.health -= pkt;		
-				console.log("HP STWORKA: " + this.inter.health + "/" + this.inter.healthMax);
-			}
-		},
-		
-		collisionObj: function() {
-			if(this.distance() < 10) {
-				animation = 'hit';	
-				
-				//this.delay('1000');
-				//setTimeout(this.damage('10'), 1000);
-				this.damage(this.damageHP);
-			}
-		},
-		
-		keydown: function(key, e) {
-			// movement keys
-			if(key === 'right') {
-				this.state.move.right = true;
-			}
-			else if(key === 'left') {
-				this.state.move.left = true;
-			}
-			else if(key === 'down') {
-				this.state.move.down = true;
-			}
-			else if(key === 'up') {
-				this.state.move.up = true;
-			}
-			
-			if(key === 'c') {
-				this.play('jump');
-			}
-			
-			// hit
-			if(key === 'i') {
-				//this.weapon.velocity.x = 1;
-				//this.weapon.scale.x = -1;
-				//this.weapon.distanceFromPlayer();
-				this.collisionObj();
-				
-			}
-		},
-		
-		keyup: function(key, e) {
-			// movement keys
-			if(key === 'right') {
-				this.state.move.right = false;
-			}
-			else if(key === 'left') {
-				this.state.move.left = false;
-			}
-			else if(key === 'down') {
-				this.state.move.down = false;
-			}
-			else if(key === 'up') {
-				this.state.move.up = false;
-			}
-			
-			// hit
-			if(key === 'i') {
-				//this.weapon.scale.x = 1;
-			}
 		}
 	});
 	
@@ -254,6 +127,225 @@
 	 * Preload assets.
 	 */
 	Game.Actors.Character.preload = function(app) {
-		app.loadImages('shadow', 'fatguy');
+		app.loadImages('shadow');
+	};
+	
+	
+	/**
+	 * Player actor.
+	 */
+	Game.Actors.Player = BBQ.Class(function() {
+		// inherite ctor call
+		Game.Actors.Character.apply(this, arguments);
+		
+		// bind events signals
+		this.bindSignal('keyEvent', this.keyEvent);
+	})
+	.extends(Game.Actors.Character)
+	.scope({
+		/**
+		 * Animations recreated.
+		 */
+		animations: {
+			idle: {
+				time: 1,
+				frames: [0]
+			},
+			walk: {
+				time: 0.42,
+				frames: [0, 1, 0, 2]
+			},
+			jump: {
+				time: .5,
+				frames: [2],
+				next: 'idle'
+			}
+		},
+		
+		/**
+		 * Update player movement state.
+		 */
+		updateState: function (delta) {
+			var animation = 'idle',
+				isJumping = this.animation === 'jump',
+				isOnGround = ! isJumping;
+
+			// on-ground movement
+			if(isOnGround) {
+				// reset velocity
+				this.velocity.x = this.velocity.y = 0;
+
+				// move horizontal
+				if (this.state.move.right) {
+					this.velocity.x = 1;
+					this.scale.x = 1;
+					animation = 'walk';
+				} else if (this.state.move.left) {
+					this.velocity.x = -1;
+					this.scale.x = -1;
+					animation = 'walk';
+				}
+
+				// move vertical
+				if (this.state.move.down) {
+					this.velocity.y = 1;
+					animation = 'walk';
+				} else if (this.state.move.up) {
+					this.velocity.y = -1;
+					animation = 'walk';
+				}
+
+				// play animation
+				this.play(animation);
+			}
+			
+			// normalize velocity vector
+			var length = Math.sqrt(
+				this.velocity.x * this.velocity.x +
+				this.velocity.y * this.velocity.y
+			);
+		
+			var speed = isOnGround ? 1.5 : 1.8;
+			this.velocity.x = ((this.velocity.x/length) * speed) || 0;
+			this.velocity.y = ((this.velocity.y/length) * speed) || 0;
+		},
+		
+		/**
+		 * Handle keyboard event.
+		 * 
+		 * @param {type} e
+		 * @param {type} down
+		 * @returns {undefined}
+		 */
+		keyEvent: function(key, down) {
+			// movement keys
+			if (key === 'right') {
+				this.state.move.right = down;
+			} else if (key === 'left') {
+				this.state.move.left = down;
+			} else if (key === 'down') {
+				this.state.move.down = down;
+			} else if (key === 'up') {
+				this.state.move.up = down;
+			}
+
+			if (key === 'c' && down) {
+				this.play('jump');
+			}
+		}
+	});
+	
+	// Preload assets
+	Game.Actors.Player.preload = function(app) {
+		app.loadImages('fatguy');
+	};
+	
+	
+	/**
+	 * Enemy actor.
+	 */
+	Game.Actors.Enemy = BBQ.Class(function() {
+		// inherite ctor call
+		Game.Actors.Character.apply(this, arguments);
+	})
+	.extends(Game.Actors.Character)
+	.scope({
+		/**
+		 * Update enemy movement state.
+		 */
+		updateState: function (delta) {
+			if (this.animation === 'jump') {
+				return;
+			}
+
+			var animation = 'idle';
+
+			// reset velocity
+			this.velocity.x = this.velocity.y = 0;
+
+			// find nearest player
+			var player = this.findNearestPlayer();
+
+			// player found
+			if(player !== false) {
+				// movement
+				if(this.distanceTo(player) > 10) {
+					this.moveTo(player, 1);
+					animation = 'walk';
+				}
+				
+				// face direction
+				this.scale.x = this.position.x > player.position.x ? -1 : 1;
+			}
+
+			// play animation
+			this.play(animation);
+		},
+		
+		/**
+		 * Returns nearest player.
+		 * 
+		 * @returns {BBQ.Actor|Boolean} Nearest player or FALSE.
+		 */
+		findNearestPlayer: function() {
+			var players = Game.app.state.players,
+				currentDistance;
+			
+			// reset following state
+			this.follow = false;
+			
+			// find nearest player
+			for(var pind in players) {
+				var player = players[pind],
+					playerDistance = this.distanceTo(player);
+				if(playerDistance < 60) { // min 30 pixels
+					if(this.follow === false || playerDistance < currentDistance) {
+						currentDistance = playerDistance;
+						this.follow = player;
+					}
+				}
+			}
+			
+			return this.follow;
+		},
+		
+		/**
+		 * Calculates distance to given actor.
+		 * 
+		 * @param {BBQ.Actor} actor Other actor.
+		 * @returns {Number} Distance between actors.
+		 */
+		distanceTo: function(actor) {
+			var x = actor.position.x - this.position.x,
+				y = actor.position.y - this.position.y;
+			
+			// algorytm pytagolasa sqrt(x^2 + y^2)
+			return Math.sqrt(
+				x*x + y*y
+			);
+		},
+		
+		/**
+		 * Moves enemy towards given actor.
+		 * Changes only velocity vector, does not work immediately.
+		 * 
+		 * @param {BBQ.Actor} actor Target actor.
+		 * @param {Number} speed Movement speed.
+		 */
+		moveTo: function(actor, speed) {
+			// normalizuj wektor
+			var distance = this.distanceTo(actor),
+				normx = (actor.position.x - this.position.x)/distance,
+				normy = (actor.position.y - this.position.y)/distance;
+			
+			// porusz 'do' (mnozac przez wektor normalnej actor.pos - this.pos)
+			this.velocity.x += normx * speed;
+			this.velocity.y += normy * speed;
+		}
+	});
+	
+	// Preload assets
+	Game.Actors.Enemy.preload = function(app) {
+		app.loadImages('enemyguy');
 	};
 })(window.Game = window.Game || {}, BBQ, PIXI);
