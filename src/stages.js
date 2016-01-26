@@ -64,13 +64,13 @@
 		
 		keydown: function(e) {
 			this.players.forEach(function(player) {
-				player.enqueueEvent('keyEvent', e.key, true, e);
+				player.enqueueEvent('keydown', e.key, true, e);
 			}, this);
 		},
 		
 		keyup: function(e) {
 			this.players.forEach(function(player) {
-				player.enqueueEvent('keyEvent', e.key, false, e);
+				player.enqueueEvent('keyup', e.key, false, e);
 			}, this);
 		}
 	});

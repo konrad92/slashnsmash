@@ -151,7 +151,8 @@
 		Game.Actors.Character.apply(this, arguments);
 		
 		// bind events signals
-		this.bindSignal('keyEvent', this.keyEvent);
+		this.bindSignal('keydown', this.onKeyEvent);
+		this.bindSignal('keyup', this.onKeyEvent);
 	})
 	.extends(Game.Actors.Character)
 	.scope({
@@ -185,10 +186,11 @@
 		updateState: function (delta) {
 			var animation = 'idle',
 				isJumping = this.animation === 'jump',
+				isAttacking = this.animation === 'punch',
 				isOnGround = ! isJumping;
 
-			// on-ground movement
-			if(isOnGround) {
+			// on-ground states handling
+			if(isOnGround && !isAttacking) {
 				// reset velocity
 				this.velocity.x = this.velocity.y = 0;
 
@@ -197,7 +199,8 @@
 					this.velocity.x = 1;
 					this.scale.x = 1;
 					animation = 'walk';
-				} else if (this.state.move.left) {
+				}
+				else if (this.state.move.left) {
 					this.velocity.x = -1;
 					this.scale.x = -1;
 					animation = 'walk';
@@ -207,9 +210,18 @@
 				if (this.state.move.down) {
 					this.velocity.y = 1;
 					animation = 'walk';
-				} else if (this.state.move.up) {
+				}
+				else if (this.state.move.up) {
 					this.velocity.y = -1;
 					animation = 'walk';
+				}
+				
+				// attack or jump
+				if(this.state.attack) {
+					animation = this.state.attack;
+				}
+				else if(this.state.jump) {
+					animation = 'jump';
 				}
 
 				// play animation
@@ -225,6 +237,10 @@
 			var speed = isOnGround ? 1.5 : 1.8;
 			this.velocity.x = ((this.velocity.x/length) * speed) || 0;
 			this.velocity.y = ((this.velocity.y/length) * speed) || 0;
+			
+			// reset once states
+			this.state.attack = false;
+			this.state.jump = false;
 		},
 		
 		/**
@@ -234,7 +250,7 @@
 		 * @param {type} down
 		 * @returns {undefined}
 		 */
-		keyEvent: function(key, down) {
+		onKeyEvent: function(key, down) {
 			// movement keys
 			if (key === 'right') {
 				this.state.move.right = down;
@@ -246,8 +262,12 @@
 				this.state.move.up = down;
 			}
 
+			if (key === 'x' && down) {
+				this.state.attack = 'punch';
+			}
+			
 			if (key === 'c' && down) {
-				this.play('jump');
+				this.state.jump = true;
 			}
 		}
 	});
