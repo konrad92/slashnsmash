@@ -27,7 +27,7 @@
 	/**
 	 * First stage - Evil Town.
 	 */
-	Game.Actors.Character = function(image) {
+	Game.Actors.Character = BBQ.Class(function(image) {
 		// inherited ctor
 		BBQ.AnimatedActor.call(this);
 		
@@ -35,9 +35,6 @@
 		if(typeof image === 'string') {
 			image = Game.app.images[image];
 		}
-		
-		// calculate texture frame size
-		this.frameSize = new PIXI.Rectangle(0, 0, 16, 28);
 		
 		// setup shadow texture
 		this.texture = Game.app.tex('shadow');
@@ -49,9 +46,12 @@
 		this.body.anchor.y = 1;
 		//this.body.texture.trim.width = this.frameSize.width;
 		//this.body.texture.trim.height = this.frameSize.height;
-		this.body.texture.trim = this.frameSize.clone();
-		this.body.texture.crop = this.frameSize.clone();
+		//this.body.texture.trim = this.frameSize.clone();
+		//this.body.texture.crop = this.frameSize.clone();
 		this.addChild(this.body);
+		
+		// calculate texture frame size
+		this.frameSize = new PIXI.Rectangle(0, 0, 16, 28);
 		
 		// states
 		this.state = {
@@ -62,10 +62,23 @@
 		
 		// character basic states
 		this.health = 100;
-	};
-	
-	// extends from BBQ.Actor class
-	BBQ.Utils.extends(Game.Actors.Character, BBQ.AnimatedActor, {
+	})
+	.extends(BBQ.AnimatedActor)
+	.properties({
+		/**
+		 * Frame size as PIXI.Rectangle
+		 */
+		frameSize: {
+			get: function() {
+				return this.body.texture.crop;
+			},
+			set: function(value) {
+				this.body.texture.trim = value.clone();
+				this.body.texture.crop = value.clone();
+			}
+		}
+	})
+	.scope({
 		/**
 		 * Animation frames to use.
 		 */
@@ -121,11 +134,10 @@
 			this.body.texture.crop.y = Math.floor(this.frameIndex / 3) *this.frameSize.height;
 			this.body.texture._updateUvs();
 		}
-	});
+	})
+	.final();
 	
-	/**
-	 * Preload assets.
-	 */
+	// Preload assets
 	Game.Actors.Character.preload = function(app) {
 		app.loadImages('shadow');
 	};
