@@ -219,6 +219,8 @@
 				// attack or jump
 				if(this.state.attack) {
 					animation = this.state.attack;
+					this.velocity.x = this.scale.x;
+					this.velocity.y = 0;
 				}
 				else if(this.state.jump) {
 					animation = 'jump';
@@ -234,7 +236,7 @@
 				this.velocity.y * this.velocity.y
 			);
 		
-			var speed = isOnGround ? 1.5 : 1.8;
+			var speed = isAttacking ? 1 : isOnGround ? 1.5 : 1.8;
 			this.velocity.x = ((this.velocity.x/length) * speed) || 0;
 			this.velocity.y = ((this.velocity.y/length) * speed) || 0;
 			
