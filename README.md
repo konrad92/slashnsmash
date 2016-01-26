@@ -17,6 +17,6 @@ Dołączone dokumenty projektu:
 Skład zespołu:
 * Agnieszka Makowska - lider zespołu
 * Konrad Nowakowski - główny programista i menedżer projektu
+* Daniel Dudzikowski - programista, grafik i dzwiękowiec
 * Przemysław Sosnowski - programista
 * Wiktor Skrobiński - tester
-* Daniel Dudzikowski - grafik i dzwiękowiec
