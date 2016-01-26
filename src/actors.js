@@ -58,10 +58,16 @@
 			move: {}
 		};
 		
+		// movement velocity
 		this.velocity = new PIXI.Point();
 		
 		// character basic states
 		this.health = 100;
+		this.speed = {
+			walk: 35,
+			jump: 50,
+			punch: 20
+		};
 	})
 	.extends(BBQ.AnimatedActor)
 	.properties({
@@ -80,7 +86,7 @@
 	})
 	.scope({
 		/**
-		 * Animation frames to use.
+		 * Animations frames to use.
 		 */
 		animations: {
 			idle: {
@@ -88,12 +94,17 @@
 				frames: [0]
 			},
 			walk: {
-				time: 0.5,
+				time: 0.42,
 				frames: [0, 1, 0, 2]
 			},
 			jump: {
 				time: .5,
 				frames: [3, 4],
+				next: 'idle'
+			},
+			punch: { // attack animation
+				time: .3,
+				frames: [6,7,8,8,8],
 				next: 'idle'
 			}
 		},
@@ -119,9 +130,10 @@
 			}
 			
 			// update physics
-			this.position.x += this.velocity.x * 25 * delta;
+			var speed = this.getCurrentSpeed();
+			this.position.x += this.velocity.x * speed * delta;
 			this.position.y = Math.min(70, Math.max(0,
-				this.position.y + this.velocity.y * 25 * delta
+				this.position.y + this.velocity.y * speed * delta
 			));
 		},
 		
@@ -133,6 +145,16 @@
 			this.body.texture.crop.x = Math.floor(this.frameIndex % 3) * this.frameSize.width;
 			this.body.texture.crop.y = Math.floor(this.frameIndex / 3) *this.frameSize.height;
 			this.body.texture._updateUvs();
+		},
+		
+		/**
+		 * Calculates current character speed by actual animation.
+		 * Different speed are each states i.e. ground/air speed.
+		 * 
+		 * @returns {Number} Speed
+		 */
+		getCurrentSpeed: function() {
+			return this.speed[this.animation] || 0;
 		}
 	})
 	.final();
@@ -156,30 +178,6 @@
 	})
 	.extends(Game.Actors.Character)
 	.scope({
-		/**
-		 * Animations recreated.
-		 */
-		animations: {
-			idle: {
-				time: 1,
-				frames: [0]
-			},
-			walk: {
-				time: 0.42,
-				frames: [0, 1, 0, 2]
-			},
-			jump: {
-				time: .5,
-				frames: [3, 4],
-				next: 'idle'
-			},
-			punch: {
-				time: .3,
-				frames: [6,7,8,8,8],
-				next: 'idle'
-			}
-		},
-		
 		/**
 		 * Update player movement state.
 		 */
@@ -231,14 +229,7 @@
 			}
 			
 			// normalize velocity vector
-			var length = Math.sqrt(
-				this.velocity.x * this.velocity.x +
-				this.velocity.y * this.velocity.y
-			);
-		
-			var speed = isAttacking ? 1 : isOnGround ? 1.5 : 1.8;
-			this.velocity.x = ((this.velocity.x/length) * speed) || 0;
-			this.velocity.y = ((this.velocity.y/length) * speed) || 0;
+			this.velocity.normalize();
 			
 			// reset once states
 			this.state.attack = false;
@@ -286,6 +277,17 @@
 	Game.Actors.Enemy = BBQ.Class(function() {
 		// inherite ctor call
 		Game.Actors.Character.apply(this, arguments);
+		
+		// following player object
+		this.follow = false;
+		
+		// enemy basic states
+		this.health = 50;
+		this.speed = {
+			walk: 25,
+			jump: 40,
+			punch: 20
+		};
 	})
 	.extends(Game.Actors.Character)
 	.scope({
@@ -331,7 +333,7 @@
 				currentDistance;
 			
 			// reset following state
-			this.follow = false;
+			//this.follow = false;
 			
 			// find nearest player
 			for(var pind in players) {

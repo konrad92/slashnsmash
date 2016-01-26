@@ -152,4 +152,34 @@
 			return _super.getAssetEntry.apply(this, arguments);
 		}
 	});
+	
+	/**
+	 * Adds additional functionality into PIXI.Point class.
+	 */
+	BBQ.Utils.assign(PIXI.Point.prototype, {
+		/**
+		 * Calculates length of the vector.
+		 * 
+		 * @returns {Number} Vector length.
+		 */
+		length: function() {
+			return Math.sqrt(
+				this.x * this.x +
+				this.y * this.y
+			);
+		},
+		
+		/**
+		 * Normalizes vector.
+		 * Makes normalization on itself.
+		 * 
+		 * @returns {PIXI.Point} Chaining *this* instance.
+		 */
+		normalize: function() {
+			var len = this.length();
+			this.x = (this.x / len) || 0;
+			this.y = (this.y / len) || 0;
+			return this;
+		}
+	});
 })(window.BBQ = window.BBQ || {}, PLAYGROUND, PIXI);
