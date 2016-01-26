@@ -7,6 +7,12 @@
  * For license details please check the LICENSE file of the project.
  * 
  * @author Konrad Nowakowski <konrad.x92@gmail.com>
+ * 
+ * Changelog:
+ * (26.01.2016)
+ *		- Dodałem nowy utility dla języka JS - BBQ.Class
+ * (30.12.2015)
+ *		- BBQ.Unilis.fullscreen() umożliwia przejście w tryb pełnoekranowy
  */
 
 /**
@@ -62,7 +68,7 @@
 		 */
 		fullscreen: function(enable) {
 			// request fullscreen
-			if(enable) {
+			if(typeof enable === 'undefined' || enable) {
 				var body = document.body,
 					requestFullscreen = body.requestFullScreen ||
 										body.webkitRequestFullScreen ||
