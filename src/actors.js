@@ -93,7 +93,7 @@
 			},
 			jump: {
 				time: .5,
-				frames: [2],
+				frames: [3, 4],
 				next: 'idle'
 			}
 		},
@@ -110,7 +110,7 @@
 			
 			// is jump animation
 			if(this.animation === 'jump') {
-				this.body.y = -Math.sin(this.frameTick * Math.PI) * 16;
+				this.body.y = -Math.sin((this.frameTick/2) * Math.PI) * 16;
 			}
 			
 			// update state
@@ -169,7 +169,12 @@
 			},
 			jump: {
 				time: .5,
-				frames: [2],
+				frames: [3, 4],
+				next: 'idle'
+			},
+			punch: {
+				time: .3,
+				frames: [6,7,8,8,8],
 				next: 'idle'
 			}
 		},
