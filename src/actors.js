@@ -388,8 +388,10 @@
 		 * @param {BBQ.Actor} other
 		 */
 		onHit: function(other) {
-			this.scale.x = -other.scale.x;
-			this.play('hit');
+			if(! this.state.jumping) {
+				this.scale.x = -other.scale.x;
+				this.play('hit');
+			}
 		}
 	});
 	
