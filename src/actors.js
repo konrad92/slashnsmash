@@ -242,31 +242,34 @@
 			// clear movement state
 			this.state.movement.set();
 			
-			// handle attacking inputs
-			if(this.input.attack && this.state.walking) {
-				this.play(this.input.attack);
-			}
-			// handle jumping input
-			else if(this.input.jump && this.state.walking) {
-				this.play('jump');
-			}
-			else {
-				// handle inputs for horizontal movement
-				if(this.input.right) {
-					this.state.movement.x = 1;
-					this.scale.x = 1;
+			// handle on-ground state
+			if(this.state.walking) {
+				// handle attacking inputs
+				if(this.input.attack) {
+					this.play(this.input.attack);
 				}
-				else if(this.input.left) {
-					this.state.movement.x = -1;
-					this.scale.x = -1;
+				// handle jumping input
+				else if(this.input.jump) {
+					this.play('jump');
 				}
-				
-				// handle inputs for vertical movement
-				if(this.input.down) {
-					this.state.movement.y = 1;
-				}
-				else if(this.input.up) {
-					this.state.movement.y = -1;
+				else {
+					// handle inputs for horizontal movement
+					if(this.input.right) {
+						this.state.movement.x = 1;
+						this.scale.x = 1;
+					}
+					else if(this.input.left) {
+						this.state.movement.x = -1;
+						this.scale.x = -1;
+					}
+
+					// handle inputs for vertical movement
+					if(this.input.down) {
+						this.state.movement.y = 1;
+					}
+					else if(this.input.up) {
+						this.state.movement.y = -1;
+					}
 				}
 			}
 			
@@ -322,6 +325,7 @@
 		
 		// following player object
 		this.follow = false;
+		this.tick = 0;
 		
 		// enemy basic states
 		this.health = 50;
@@ -347,11 +351,12 @@
 					this.state.movement.set();
 					
 					// movement
-					if(this.distanceTo(player) > 10) {
+					if(this.distanceTo(player) > 6) {
 						this.moveTo(player);
 					}
-					else {
+					else if(this.tick-- <= 0) {
 						this.play('punch');
+						this.tick = 10;
 					}
 
 					// face direction
