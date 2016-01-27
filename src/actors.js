@@ -63,6 +63,7 @@
 		
 		// collision bounding box
 		this.bbox = new PIXI.Rectangle(0, 0, 16, 8);
+		this.hitBbox = new PIXI.Rectangle(0, 0, 4, 10);
 		
 		// character basic states
 		this.health = 100;
@@ -195,7 +196,7 @@
 			
 			// attacking collision informer
 			if(this.state.attacking && this.frameTick > 2) {
-				var actor = this.getActorCollision(this.scale.x*2, 0);
+				var actor = this.getActorHitCollision(this.scale.x*2, 0);
 				if(actor !== false) {
 					actor.emitSignal('hit', this);
 				}
@@ -227,14 +228,31 @@
 		},
 		
 		/**
+		 * Returns world bounding box.
+		 * 
+		 * @returns {PIXI.Rectangle}
+		 */
+		getWorldHitBBox: function(x, y) {
+			var _cx = this.hitBbox.width / 2,
+				_cy = this.hitBbox.height / 2;
+			
+			return new PIXI.Rectangle(
+				this.position.x - _cx + this.hitBbox.x + (x || 0),
+				this.position.y - _cy + this.hitBbox.y + (y || 0),
+				this.hitBbox.width,
+				this.hitBbox.height
+			);
+		},
+		
+		/**
 		 * Returns collision with actor.
 		 * 
 		 * @param {Number} x Shift aabb.x coord by given value.
 		 * @param {Number} y Shift aabb.y coord by given value.
 		 * @returns {BBQ.Actor|Boolean} Collided actor or FALSE.
 		 */
-		getActorCollision: function(x, y) {
-			var _bbox = this.getWorldBBox(x, y),
+		getActorHitCollision: function(x, y) {
+			var _bbox = this.getWorldHitBBox(x, y),
 				actors = Game.app.state.actors.children,
 				actor;
 			
