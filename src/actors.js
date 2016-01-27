@@ -55,17 +55,21 @@
 		
 		// states
 		this.state = {
-			move: {}
+			movement: new PIXI.Point()
 		};
 		
 		// movement velocity
 		this.velocity = new PIXI.Point();
+		
+		// collision bounding box
+		this.bbox = new PIXI.Rectangle(0, 0, 16, 8);
 		
 		// character basic states
 		this.health = 100;
 		this.speed = {
 			walk: 35,
 			jump: 50,
+			hit: -50,
 			punch: 20
 		};
 	})
@@ -102,6 +106,11 @@
 				frames: [3, 4],
 				next: 'idle'
 			},
+			hit: {
+				time: .35,
+				frames: [5],
+				next: 'idle'
+			},
 			punch: { // attack animation
 				time: .3,
 				frames: [6,7,8,8,8],
@@ -119,8 +128,8 @@
 			// update animation frame
 			this.updateAnimFrame();
 			
-			// is jump animation
-			if(this.animation === 'jump') {
+			// is jump/hit animation
+			if(this.animation === 'jump' || this.animation === 'hit') {
 				this.body.y = -Math.sin((this.frameTick/2) * Math.PI) * 16;
 			}
 			
@@ -130,11 +139,7 @@
 			}
 			
 			// update physics
-			var speed = this.getCurrentSpeed();
-			this.position.x += this.velocity.x * speed * delta;
-			this.position.y = Math.min(70, Math.max(0,
-				this.position.y + this.velocity.y * speed * delta
-			));
+			this.updatePhysics(delta);
 		},
 		
 		/**
@@ -145,6 +150,43 @@
 			this.body.texture.crop.x = Math.floor(this.frameIndex % 3) * this.frameSize.width;
 			this.body.texture.crop.y = Math.floor(this.frameIndex / 3) *this.frameSize.height;
 			this.body.texture._updateUvs();
+		},
+		
+		/**
+		 * Updates character physic.
+		 * 
+		 * @returns {undefined}
+		 */
+		updatePhysics: function(delta) {
+			this.state.walking = this.animation === 'idle' || this.animation === 'walk';
+			this.state.jumping = this.animation === 'jump';
+			this.state.hitted = this.animation === 'hit';
+			this.state.attacking = this.animation === 'punch';
+			
+			// free movement (unlocked)
+			if(this.state.walking) {
+				this.velocity = this.state.movement.clone().normalize();
+				
+				// play animation
+				if(this.velocity.x || this.velocity.y) {
+					this.play('walk');
+				}
+				else {
+					this.play('idle');
+				}
+			}
+			
+			// attacking or hitted movement
+			if(this.state.attacking || this.state.hitted) {
+				this.velocity.set(this.scale.x, 0).normalize();
+			}
+			
+			// update position
+			var speed = this.getCurrentSpeed();
+			this.position.x += this.velocity.x * speed * delta;
+			this.position.y = Math.min(70, Math.max(0,
+				this.position.y + this.velocity.y * speed * delta
+			));
 		},
 		
 		/**
@@ -172,6 +214,9 @@
 		// inherite ctor call
 		Game.Actors.Character.apply(this, arguments);
 		
+		// events holder
+		this.input = {};
+		
 		// bind events signals
 		this.bindSignal('keydown', this.onKeyEvent);
 		this.bindSignal('keyup', this.onKeyEvent);
@@ -182,58 +227,40 @@
 		 * Update player movement state.
 		 */
 		updateState: function (delta) {
-			var animation = 'idle',
-				isJumping = this.animation === 'jump',
-				isAttacking = this.animation === 'punch',
-				isOnGround = ! isJumping;
-
-			// on-ground states handling
-			if(isOnGround && !isAttacking) {
-				// reset velocity
-				this.velocity.x = this.velocity.y = 0;
-
-				// move horizontal
-				if (this.state.move.right) {
-					this.velocity.x = 1;
+			// clear movement state
+			this.state.movement.set();
+			
+			// handle attacking inputs
+			if(this.input.attack && this.state.walking) {
+				this.play(this.input.attack);
+			}
+			// handle jumping input
+			else if(this.input.jump && this.state.walking) {
+				this.play('jump');
+			}
+			else {
+				// handle inputs for horizontal movement
+				if(this.input.right) {
+					this.state.movement.x = 1;
 					this.scale.x = 1;
-					animation = 'walk';
 				}
-				else if (this.state.move.left) {
-					this.velocity.x = -1;
+				else if(this.input.left) {
+					this.state.movement.x = -1;
 					this.scale.x = -1;
-					animation = 'walk';
-				}
-
-				// move vertical
-				if (this.state.move.down) {
-					this.velocity.y = 1;
-					animation = 'walk';
-				}
-				else if (this.state.move.up) {
-					this.velocity.y = -1;
-					animation = 'walk';
 				}
 				
-				// attack or jump
-				if(this.state.attack) {
-					animation = this.state.attack;
-					this.velocity.x = this.scale.x;
-					this.velocity.y = 0;
+				// handle inputs for vertical movement
+				if(this.input.down) {
+					this.state.movement.y = 1;
 				}
-				else if(this.state.jump) {
-					animation = 'jump';
+				else if(this.input.up) {
+					this.state.movement.y = -1;
 				}
-
-				// play animation
-				this.play(animation);
 			}
 			
-			// normalize velocity vector
-			this.velocity.normalize();
-			
-			// reset once states
-			this.state.attack = false;
-			this.state.jump = false;
+			// clear states
+			this.input.attack = false;
+			this.input.jump = false;
 		},
 		
 		/**
@@ -246,21 +273,21 @@
 		onKeyEvent: function(key, down) {
 			// movement keys
 			if (key === 'right') {
-				this.state.move.right = down;
+				this.input.right = down;
 			} else if (key === 'left') {
-				this.state.move.left = down;
+				this.input.left = down;
 			} else if (key === 'down') {
-				this.state.move.down = down;
+				this.input.down = down;
 			} else if (key === 'up') {
-				this.state.move.up = down;
+				this.input.up = down;
 			}
 
 			if (key === 'x' && down) {
-				this.state.attack = 'punch';
+				this.input.attack = 'punch';
 			}
 			
 			if (key === 'c' && down) {
-				this.state.jump = true;
+				this.input.jump = true;
 			}
 		}
 	});
@@ -295,32 +322,24 @@
 		 * Update enemy movement state.
 		 */
 		updateState: function (delta) {
-			if (this.animation === 'jump') {
-				return;
-			}
+			if(this.state.walking) {
+				// find nearest player
+				var player = this.findNearestPlayer();
 
-			var animation = 'idle';
+				// player found
+				if(player !== false) {
+					// clear movement state
+					this.state.movement.set();
+					
+					// movement
+					if(this.distanceTo(player) > 10) {
+						this.moveTo(player);
+					}
 
-			// reset velocity
-			this.velocity.x = this.velocity.y = 0;
-
-			// find nearest player
-			var player = this.findNearestPlayer();
-
-			// player found
-			if(player !== false) {
-				// movement
-				if(this.distanceTo(player) > 10) {
-					this.moveTo(player, 1);
-					animation = 'walk';
+					// face direction
+					this.scale.x = this.position.x > player.position.x ? -1 : 1;
 				}
-				
-				// face direction
-				this.scale.x = this.position.x > player.position.x ? -1 : 1;
 			}
-
-			// play animation
-			this.play(animation);
 		},
 		
 		/**
@@ -374,14 +393,12 @@
 		 * @param {Number} speed Movement speed.
 		 */
 		moveTo: function(actor, speed) {
-			// normalizuj wektor
-			var distance = this.distanceTo(actor),
-				normx = (actor.position.x - this.position.x)/distance,
-				normy = (actor.position.y - this.position.y)/distance;
+			var distance = this.distanceTo(actor);
 			
-			// porusz 'do' (mnozac przez wektor normalnej actor.pos - this.pos)
-			this.velocity.x += normx * speed;
-			this.velocity.y += normy * speed;
+			// normalizuj wektor ia porusz 'do'
+			// (mnozac przez wektor normalnej actor.pos - this.pos)
+			this.state.movement.x = (actor.position.x - this.position.x)/distance;
+			this.state.movement.y = (actor.position.y - this.position.y)/distance;
 		}
 	});
 	

@@ -158,6 +158,40 @@
 	 */
 	BBQ.Utils.assign(PIXI.Point.prototype, {
 		/**
+		 * Override vector values.
+		 * @returns {PIXI.Point} Chaining *this* instance.
+		 */
+		set: function(x, y) {
+			this.x = x || 0;
+			this.y = y || 0;
+			return this;
+		},
+		
+		/**
+		 * Multiplies vector by a scalar.
+		 * 
+		 * @param {Number} scalar
+		 * @returns {PIXI.Point} Chaining *this* instance.
+		 */
+		mul: function(scalar) {
+			this.x = (this.x * scalar) || 0;
+			this.y = (this.y * scalar) || 0;
+			return this;
+		},
+		
+		/**
+		 * Divides vector by a scalar.
+		 * 
+		 * @param {Number} scalar
+		 * @returns {PIXI.Point} Chaining *this* instance.
+		 */
+		div: function(scalar) {
+			this.x = (this.x / scalar) || 0;
+			this.y = (this.y / scalar) || 0;
+			return this;
+		},
+		
+		/**
 		 * Calculates length of the vector.
 		 * 
 		 * @returns {Number} Vector length.
@@ -176,10 +210,7 @@
 		 * @returns {PIXI.Point} Chaining *this* instance.
 		 */
 		normalize: function() {
-			var len = this.length();
-			this.x = (this.x / len) || 0;
-			this.y = (this.y / len) || 0;
-			return this;
+			return this.div(this.length());
 		}
 	});
 })(window.BBQ = window.BBQ || {}, PLAYGROUND, PIXI);
