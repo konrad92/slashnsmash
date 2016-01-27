@@ -70,7 +70,8 @@
 			walk: 35,
 			jump: 50,
 			hit: -50,
-			punch: 20
+			punch: 20,
+			kick: 10
 		};
 	})
 	.extends(BBQ.AnimatedActor)
@@ -115,6 +116,11 @@
 				time: .3,
 				frames: [6,7,8,8,8],
 				next: 'idle'
+			},
+			kick: { // attack animation
+				time: .3,
+				frames: [9,10,11,11,11],
+				next: 'idle'
 			}
 		},
 		
@@ -128,9 +134,15 @@
 			// update animation frame
 			this.updateAnimFrame();
 			
-			// is jump/hit animation
-			if(this.animation === 'jump' || this.animation === 'hit') {
+			// jump/hit/kick animation height
+			if(this.animation === 'jump') {
 				this.body.y = -Math.sin((this.frameTick/2) * Math.PI) * 16;
+			}
+			else if(this.animation === 'hit') {
+				this.body.y = -Math.sin((this.frameTick) * Math.PI) * 12;
+			}
+			else if(this.animation === 'kick') {
+				this.body.y = -Math.sin((this.frameTick/5) * Math.PI) * 8;
 			}
 			
 			// update state
@@ -161,7 +173,7 @@
 			this.state.walking = this.animation === 'idle' || this.animation === 'walk';
 			this.state.jumping = this.animation === 'jump';
 			this.state.hitted = this.animation === 'hit';
-			this.state.attacking = this.animation === 'punch';
+			this.state.attacking = this.animation === 'punch' || this.animation === 'kick';
 			
 			// free movement (unlocked)
 			if(this.state.walking) {
@@ -285,6 +297,9 @@
 			if (key === 'x' && down) {
 				this.input.attack = 'punch';
 			}
+			else if (key === 'z' && down) {
+				this.input.attack = 'kick';
+			}
 			
 			if (key === 'c' && down) {
 				this.input.jump = true;
@@ -334,6 +349,9 @@
 					// movement
 					if(this.distanceTo(player) > 10) {
 						this.moveTo(player);
+					}
+					else {
+						this.play('punch');
 					}
 
 					// face direction
