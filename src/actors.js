@@ -139,7 +139,7 @@
 				this.body.y = -Math.sin((this.frameTick/2) * Math.PI) * 16;
 			}
 			else if(this.animation === 'hit') {
-				this.body.y = -Math.sin((this.frameTick) * Math.PI) * 12;
+				this.body.y = -Math.sin((this.frameTick) * Math.PI) * 8;
 			}
 			else if(this.animation === 'kick') {
 				this.body.y = -Math.sin((this.frameTick/5) * Math.PI) * 8;
@@ -193,12 +193,64 @@
 				this.velocity.set(this.scale.x, 0).normalize();
 			}
 			
+			// attacking collision informer
+			if(this.state.attacking && this.frameTick > 2) {
+				var actor = this.getActorCollision(this.scale.x*2, 0);
+				if(actor !== false) {
+					actor.emitSignal('hit', this);
+				}
+			}
+			
 			// update position
 			var speed = this.getCurrentSpeed();
 			this.position.x += this.velocity.x * speed * delta;
 			this.position.y = Math.min(70, Math.max(0,
 				this.position.y + this.velocity.y * speed * delta
 			));
+		},
+		
+		/**
+		 * Returns world bounding box.
+		 * 
+		 * @returns {PIXI.Rectangle}
+		 */
+		getWorldBBox: function(x, y) {
+			var _cx = this.bbox.width / 2,
+				_cy = this.bbox.height / 2;
+			
+			return new PIXI.Rectangle(
+				this.position.x - _cx + this.bbox.x + (x || 0),
+				this.position.y - _cy + this.bbox.y + (y || 0),
+				this.bbox.width,
+				this.bbox.height
+			);
+		},
+		
+		/**
+		 * Returns collision with actor.
+		 * 
+		 * @param {Number} x Shift aabb.x coord by given value.
+		 * @param {Number} y Shift aabb.y coord by given value.
+		 * @returns {BBQ.Actor|Boolean} Collided actor or FALSE.
+		 */
+		getActorCollision: function(x, y) {
+			var _bbox = this.getWorldBBox(x, y),
+				actors = Game.app.state.actors.children,
+				actor;
+			
+			for(var aind in actors) {
+				actor = actors[aind];
+				if(actor === this) {
+					continue;
+				}
+				if(typeof actor.bbox !== 'undefined') {
+					if(actor.getWorldBBox().intersects(_bbox)) {
+						return actor;
+					}
+				}
+			}
+			
+			return false;
 		},
 		
 		/**
@@ -232,6 +284,9 @@
 		// bind events signals
 		this.bindSignal('keydown', this.onKeyEvent);
 		this.bindSignal('keyup', this.onKeyEvent);
+		
+		// binds common signals
+		this.bindSignal('hit', this.onHit);
 	})
 	.extends(Game.Actors.Character)
 	.scope({
@@ -307,6 +362,16 @@
 			if (key === 'c' && down) {
 				this.input.jump = true;
 			}
+		},
+		
+		/**
+		 * Handle an hit signal.
+		 * 
+		 * @param {BBQ.Actor} other
+		 */
+		onHit: function(other) {
+			this.scale.x = -other.scale.x;
+			this.play('hit');
 		}
 	});
 	
@@ -323,6 +388,9 @@
 		// inherite ctor call
 		Game.Actors.Character.apply(this, arguments);
 		
+		// bind additional signals
+		this.bindSignal('hit', this.onHit);
+		
 		// following player object
 		this.follow = false;
 		this.tick = 0;
@@ -332,7 +400,9 @@
 		this.speed = {
 			walk: 25,
 			jump: 40,
-			punch: 20
+			hit: -50,
+			punch: 20,
+			kick: 10
 		};
 	})
 	.extends(Game.Actors.Character)
@@ -351,12 +421,12 @@
 					this.state.movement.set();
 					
 					// movement
-					if(this.distanceTo(player) > 6) {
+					if(this.distanceTo(player) > 10) {
 						this.moveTo(player);
 					}
 					else if(this.tick-- <= 0) {
-						this.play('punch');
-						this.tick = 10;
+						this.play(Math.random() < 0.75 ? 'punch' : 'kick');
+						this.tick = 5 + 10 * Math.random();
 					}
 
 					// face direction
@@ -422,6 +492,16 @@
 			// (mnozac przez wektor normalnej actor.pos - this.pos)
 			this.state.movement.x = (actor.position.x - this.position.x)/distance;
 			this.state.movement.y = (actor.position.y - this.position.y)/distance;
+		},
+		
+		/**
+		 * Handle an hit signal.
+		 * 
+		 * @param {BBQ.Actor} other
+		 */
+		onHit: function(other) {
+			this.scale.x = -other.scale.x;
+			this.play('hit');
 		}
 	});
 	

@@ -213,4 +213,22 @@
 			return this.div(this.length());
 		}
 	});
+	
+	/**
+	 * Adds additional functionality into PIXI.Rectangle class.
+	 */
+	BBQ.Utils.assign(PIXI.Rectangle.prototype, {
+		/**
+		 * Determines intersection between rectangles.
+		 * 
+		 * @param {PIXI.Rectangle} rect
+		 * @returns {Boolean}
+		 */
+		intersects: function(rect) {
+			return (
+				(this.x + this.width >= rect.x && this.x <= rect.x + rect.width) &&
+				(this.y + this.height >= rect.y && this.y <= rect.y + rect.height)
+			);
+		}
+	});
 })(window.BBQ = window.BBQ || {}, PLAYGROUND, PIXI);
