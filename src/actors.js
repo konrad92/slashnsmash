@@ -455,6 +455,9 @@
 		this.bindSignal('touchstart', this.onTouchStart);
 		this.bindSignal('touchmove', this.onTouchMove);
 		this.bindSignal('touchend', this.onTouchEnd);
+		
+		// bind common events
+		this.bindSignal('destroy', this.destroyIndicator);
 	})
 	.extends(Game.Actors.Player)
 	.scope({
@@ -524,10 +527,17 @@
 				this.input.up    = false;
 				
 				// remove indicator
-				if(this.indicator) {
-					Game.app.state.foreground.removeChild(this.indicator);
-					this.indicator = false;
-				}
+				this.destroyIndicator();
+			}
+		},
+		
+		/**
+		 * Removes indicator if exists.
+		 */
+		destroyIndicator: function() {
+			if(this.indicator) {
+				Game.app.state.foreground.removeChild(this.indicator);
+				this.indicator = false;
 			}
 		}
 	});
