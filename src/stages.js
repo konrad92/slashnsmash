@@ -47,16 +47,101 @@
 	});
 	
 	/**
+	 * Game states.
+	 */
+	Game.State = {};
+	
+	/**
+	 * Menu state definition.
+	 */
+	Game.State.Menu = BBQ.Class(function() {
+		BBQ.State.apply(this, arguments);
+		var sp = new Game.State.Menu.Button(Game.app.tex('singleplayer'));
+		var mp = new Game.State.Menu.Button(Game.app.tex('multiplayer'));
+		var fs = new Game.State.Menu.Button(Game.app.tex('fullscreen'));
+		sp.offset.y = -25;
+		mp.offset.y = 0;
+		fs.offset.y = 25;
+		
+		sp.click = function() {
+			Game.app.singleplayer = true;
+			Game.app.setState(new Game.State.Stage());
+		};
+		
+		mp.click = function() {
+			Game.app.singleplayer = false;
+			Game.app.setState(new Game.State.Stage());
+		};
+		
+		fs.click = function() {
+			BBQ.Utils.fullscreen();
+		};
+		
+		sp.bind();
+		mp.bind();
+		fs.bind();
+		
+		this.addChild(sp);
+		this.addChild(mp);
+		this.addChild(fs);
+	})
+	.extends(BBQ.State);
+	
+	// Common menu button
+	Game.State.Menu.Button = BBQ.Class(function() {
+		PIXI.Sprite.apply(this, arguments);
+		this.anchor = new PIXI.Point(0.5, 0.5);
+		this.interactive = true;
+		this.offset = new PIXI.Point();
+	})
+	.extends(PIXI.Sprite)
+	.scope({
+		/**
+		 * Button clicked handler.
+		 */
+		click: function() {
+			// dummy
+			console.log('asd1');
+		},
+		
+		/**
+		 * Bind events.
+		 */
+		bind: function() {
+			this.on('mousedown', this.click.bind(this));
+			this.on('touchstart', this.click.bind(this));
+		},
+		
+		/**
+		 * Center buttons.
+		 */
+		updateTransform: function() {
+			var _scrhw = Game.app.renderer.width / 2,
+				_scrhh = Game.app.renderer.height / 2;
+			
+			this.position.x = _scrhw + this.offset.x;
+			this.position.y = _scrhh + this.offset.y;
+			PIXI.Sprite.prototype.updateTransform.call(this);
+		}
+	});
+	
+	// Preload assets
+	Game.State.Menu.preload = function(app) {
+		app.loadImages('singleplayer', 'multiplayer', 'fullscreen');
+	};
+	
+	/**
 	 * Common stage definition.
 	 */
-	Game.Stage = function() {
+	Game.State.Stage = function() {
 		BBQ.State.call(this);
 		
 		this.players = [];
+		this.timer = 10;
 	};
 	
 	// extends Game.Stage by BBQ.State class
-	BBQ.Utils.extends(Game.Stage, BBQ.State, {
+	BBQ.Utils.extends(Game.State.Stage, BBQ.State, {
 		/**
 		 * Prepares game stage.
 		 */
@@ -78,32 +163,57 @@
 			this.camera.follow(chara);
 			this.players.push(chara);
 			
-			chara = new Game.Actors.Player('fatguy');
-			chara.position.x = 100;
-			chara.keymap = {
-				right: 'd',
-				left: 'a',
-				down: 's',
-				up: 'w',
-				
-				punch: 't',
-				kick: 'y',
-				jump: 'g'
-			};
-			this.camera.follow(chara);
-			this.actors.addChild(chara);
-			this.players.push(chara);
+			if(! Game.app.singleplayer) {
+				chara = new Game.Actors.Player('fatguy');
+				chara.position.x = 100;
+				chara.keymap = {
+					right: 'd',
+					left: 'a',
+					down: 's',
+					up: 'w',
+
+					punch: 't',
+					kick: 'y',
+					jump: 'g'
+				};
+				this.camera.follow(chara);
+				this.actors.addChild(chara);
+				this.players.push(chara);
+			}
 			
-			var enemy = new Game.Actors.Enemy('enemyguy');
-			this.actors.addChild(enemy);
+			//var enemy = new Game.Actors.Enemy('enemyguy');
+			//this.actors.addChild(enemy);
 		},
 		
+		/**
+		 * Overrides state step.
+		 */
+		step: function() {
+			BBQ.State.prototype.step.apply(this, arguments);
+			
+			// create enemies durning time
+			if(this.players.length > 0 && this.timer-- < 0) {
+				this.timer = 80 + 200 * Math.random();
+				
+				var enemy = new Game.Actors.Enemy('enemyguy');
+				enemy.position.x = (Math.random() < 0.5 ? -1 : 1)*400;
+				
+				this.actors.addChild(enemy);
+			}
+		},
+		
+		/**
+		 * Keydown event handle.
+		 */
 		keydown: function(e) {
 			this.players.forEach(function(player) {
 				player.enqueueEvent('keydown', e.key, true, e);
 			}, this);
 		},
 		
+		/**
+		 * 
+		 */
 		keyup: function(e) {
 			this.players.forEach(function(player) {
 				player.enqueueEvent('keyup', e.key, false, e);

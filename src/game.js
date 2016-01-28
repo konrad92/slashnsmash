@@ -183,7 +183,7 @@
 		 */
 		ready: function() {
 			// switch to game state
-			this.setState(new Game.Stage());
+			this.setState(new Game.State.Menu());
 		},
 		
 		/**

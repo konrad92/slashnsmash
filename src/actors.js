@@ -369,6 +369,18 @@
 		},
 		
 		/**
+		 * Overrides by applying scene boundings.
+		 * 
+		 * @returns {undefined}
+		 */
+		updatePhysics: function(delta) {
+			Game.Actors.Character.prototype.updatePhysics.call(this, delta);
+			
+			// make scene bounds
+			this.position.x = Math.max(-250, Math.min(250, this.position.x));
+		},
+		
+		/**
 		 * Handle keyboard event.
 		 * 
 		 * @param {type} e
@@ -582,7 +594,7 @@
 		 */
 		findNearestPlayer: function() {
 			var players = Game.app.state.players,
-				currentDistance = 100;
+				currentDistance = 10000;
 			
 			// reset following state
 			//this.follow = false;
@@ -591,12 +603,12 @@
 			for(var pind in players) {
 				var player = players[pind],
 					playerDistance = this.distanceTo(player);
-				if(playerDistance < 60) { // min 30 pixels
+				//if(playerDistance < 60) { // min 60 pixels
 					if(this.follow === false || playerDistance < currentDistance) {
 						currentDistance = playerDistance;
 						this.follow = player;
 					}
-				}
+				//}
 			}
 			
 			// player were killed
