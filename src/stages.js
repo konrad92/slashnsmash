@@ -197,6 +197,7 @@
 				
 				var enemy = new Game.Actors.Enemy('enemyguy');
 				enemy.position.x = (Math.random() < 0.5 ? -1 : 1)*400;
+				enemy.position.y = Math.random()*100;
 				
 				this.actors.addChild(enemy);
 			}

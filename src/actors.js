@@ -474,15 +474,15 @@
 						x: x,
 						y: y
 					};
+				
+					// create indicator
+					this.indicator = new PIXI.Sprite(Game.app.tex('indicator'));
+					this.indicator.anchor = new PIXI.Point(0.5, 0.5);
+					this.indicator.position.x = x;
+					this.indicator.position.y = y;
+
+					Game.app.state.foreground.addChild(this.indicator);
 				}
-				
-				// create indicator
-				this.indicator = new PIXI.Sprite(Game.app.tex('indicator'));
-				this.indicator.anchor = new PIXI.Point(0.5, 0.5);
-				this.indicator.position.x = x;
-				this.indicator.position.y = y;
-				
-				Game.app.state.foreground.addChild(this.indicator);
 			}
 			// jump & attack
 			else {

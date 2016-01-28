@@ -52,7 +52,7 @@
 			/**
 			 * Shows console container when document's ready.
 			 */
-			showOnReady: true,
+			showOnReady: false,
 			
 			/**
 			 * Changes static status content.
