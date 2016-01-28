@@ -87,8 +87,6 @@
 			spr.anchor.x = 0.5;
 			spr.anchor.y = 1;
 			this.actors.addChild(spr);
-			
-			this.foreground.addChild(new Game.Fatality());
 		},
 		
 		keydown: function(e) {
