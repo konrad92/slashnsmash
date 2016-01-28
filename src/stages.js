@@ -20,6 +20,33 @@
 	"use strict";
 	
 	/**
+	 * Fatality image.
+	 */
+	Game.Fatality = BBQ.Class(function() {
+		// call inherited ctor
+		PIXI.Sprite.call(this, Game.app.tex('fatality'));
+		
+		// change sprite anchor to center
+		this.anchor = new PIXI.Point(0.5, 0.5);
+		this.timer = 100;
+	})
+	.extends(PIXI.Sprite)
+	.scope({
+		/**
+		 * Center fatality image.
+		 */
+		updateTransform: function() {
+			this.position.x = Game.app.renderer.width / 2;
+			this.position.y = (Game.app.renderer.height / 2.5) - Math.abs(Math.cos((this.timer/100 + 50)*Math.PI) * 100 * Math.sin((this.timer/200)*Math.PI));
+			PIXI.Sprite.prototype.updateTransform.call(this);
+			
+			if(this.timer > 0) {
+				this.timer--;
+			}
+		}
+	});
+	
+	/**
 	 * Common stage definition.
 	 */
 	Game.Stage = function() {
@@ -60,6 +87,8 @@
 			spr.anchor.x = 0.5;
 			spr.anchor.y = 1;
 			this.actors.addChild(spr);
+			
+			this.foreground.addChild(new Game.Fatality());
 		},
 		
 		keydown: function(e) {
@@ -72,13 +101,36 @@
 			this.players.forEach(function(player) {
 				player.enqueueEvent('keyup', e.key, false, e);
 			}, this);
+		},
+		
+		playerKilled: function(player) {
+			var ind = this.players.indexOf(player);
+			if(ind !== -1) {
+				this.players.splice(ind, 1);
+				console.log(this.players);
+			}
+			
+			// fatality message
+			if(this.players.length <= 0) {
+				this.foreground.addChild(new Game.Fatality());
+			}
 		}
 	});
+	
 	
 	/**
 	 * All game stages definitions.
 	 */
 	Game.Stages = {};
+	
+	/**
+	 * Common preload assets.
+	 */
+	Game.Stages._ = {
+		preload: function(app) {
+			app.loadImages('fatality');
+		}
+	};
 	
 	/**
 	 * First stage - Evil Town.

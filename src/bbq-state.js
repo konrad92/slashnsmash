@@ -30,6 +30,9 @@
 		
 		// events set
 		this.events = [];
+		
+		// wether actor is no-more live
+		this.killed = false;
 	};
 	
 	// extends BBQ.Actor by PIXI.Sprite class
@@ -157,6 +160,7 @@
 		destroy: function() {
 			if(this.parent && this.parent.toDelete) {
 				this.parent.toDelete.push(this);
+				this.killed = true;
 			}
 		}
 	});

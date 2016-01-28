@@ -169,6 +169,7 @@
 				var Game_Child = Game[i];
 				if(typeof Game_Child === 'object') {
 					for(var n in Game_Child) {
+						// invoke preloads for Game.Object.Object.preload
 						if(typeof Game_Child[n].preload === 'function') {
 							Game_Child[n].preload.call(this, this);
 						}

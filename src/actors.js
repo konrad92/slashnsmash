@@ -67,7 +67,10 @@
 		
 		// character basic states
 		this.health = 100;
-		this.strength = 1;
+		this.strength = {
+			punch: 10,
+			kick: 15
+		};
 		this.speed = {
 			walk: 35,
 			jump: 50,
@@ -120,7 +123,7 @@
 				next: 'idle'
 			},
 			kick: { // attack animation
-				time: .3,
+				time: .4,
 				frames: [9,10,11,11,11],
 				next: 'idle'
 			}
@@ -297,8 +300,22 @@
 		// inherite ctor call
 		Game.Actors.Character.apply(this, arguments);
 		
-		// events holder
+		// input events holder
 		this.input = {};
+		
+		// input keymapping
+		this.keymap = {
+			type: 'keyboard',
+			
+			right: 'right',
+			left: 'left',
+			up: 'up',
+			down: 'down',
+			
+			punch: 'p',
+			jump: 'o',
+			kick: 'l'
+		};
 		
 		// bind events signals
 		this.bindSignal('keydown', this.onKeyEvent);
@@ -361,24 +378,24 @@
 		 */
 		onKeyEvent: function(key, down) {
 			// movement keys
-			if (key === 'right') {
+			if (key === this.keymap.right) {
 				this.input.right = down;
-			} else if (key === 'left') {
+			} else if (key === this.keymap.left) {
 				this.input.left = down;
-			} else if (key === 'down') {
+			} else if (key === this.keymap.down) {
 				this.input.down = down;
-			} else if (key === 'up') {
+			} else if (key === this.keymap.up) {
 				this.input.up = down;
 			}
 
-			if (key === 'x' && down) {
+			if (key === this.keymap.punch && down) {
 				this.input.attack = 'punch';
 			}
-			else if (key === 'z' && down) {
+			else if (key === this.keymap.kick && down) {
 				this.input.attack = 'kick';
 			}
 			
-			if (key === 'c' && down) {
+			if (key === this.keymap.jump && down) {
 				this.input.jump = true;
 			}
 		},
@@ -391,8 +408,13 @@
 		onHit: function(other) {
 			if(! this.state.hitted && ! this.state.jumping) {
 				this.scale.x = -other.scale.x;
-				this.health -= 10 * other.strength;
+				this.health -= other.strength[other.animation] || 10;
 				this.play('hit');
+				
+				if(this.health < 0) {
+					Game.app.state.playerKilled(this);
+					this.destroy();
+				}
 			}
 		}
 	});
@@ -481,6 +503,11 @@
 				}
 			}
 			
+			// player were killed
+			if(this.follow && this.follow.killed) {
+				this.follow = false;
+			}
+			
 			return this.follow;
 		},
 		
@@ -524,7 +551,7 @@
 		onHit: function(other) {
 			if(! this.state.hitted) {
 				this.scale.x = -other.scale.x;
-				this.health -= 10 * other.strength;
+				this.health -= other.strength[other.animation] || 10;
 				this.play('hit');
 				
 				if(this.health <= 0) {
