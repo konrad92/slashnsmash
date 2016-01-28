@@ -72,21 +72,30 @@
 				htiled: true
 			});
 			
-			var chara = new Game.Actors.Player('fatguy');
+			var chara = new Game.Actors.PlayerTouchScreen('fatguy');
 			chara.position.x = 60;
 			this.actors.addChild(chara);
 			this.camera.follow(chara);
 			this.players.push(chara);
 			
+			chara = new Game.Actors.Player('fatguy');
+			chara.position.x = 100;
+			chara.keymap = {
+				right: 'd',
+				left: 'a',
+				down: 's',
+				up: 'w',
+				
+				punch: 't',
+				kick: 'y',
+				jump: 'g'
+			};
+			this.camera.follow(chara);
+			this.actors.addChild(chara);
+			this.players.push(chara);
+			
 			var enemy = new Game.Actors.Enemy('enemyguy');
 			this.actors.addChild(enemy);
-			
-			var spr = new BBQ.Actor(Game.app.tex('fatguy'));
-			spr.position.x = 60;
-			spr.position.y = 50;
-			spr.anchor.x = 0.5;
-			spr.anchor.y = 1;
-			this.actors.addChild(spr);
 		},
 		
 		keydown: function(e) {
@@ -101,11 +110,28 @@
 			}, this);
 		},
 		
+		touchstart: function(e) {
+			this.players.forEach(function(player) {
+				player.enqueueEvent('touchstart', e.identifier, e.x, e.y, false, e);
+			}, this);
+		},
+		
+		touchmove: function(e) {
+			this.players.forEach(function(player) {
+				player.enqueueEvent('touchmove', e.identifier, e.x, e.y, false, e);
+			}, this);
+		},
+		
+		touchend: function(e) {
+			this.players.forEach(function(player) {
+				player.enqueueEvent('touchend', e.identifier, e.x, e.y, false, e);
+			}, this);
+		},
+		
 		playerKilled: function(player) {
 			var ind = this.players.indexOf(player);
 			if(ind !== -1) {
 				this.players.splice(ind, 1);
-				console.log(this.players);
 			}
 			
 			// fatality message

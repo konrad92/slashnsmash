@@ -326,9 +326,7 @@
 		unfollow: function(actor) {
 			var index = this.followed.indexOf(actor);
 			if(index !== -1) {
-				this.followed = this.followed.splice(
-					index, 1
-				);
+				this.followed.splice(index, 1);
 			}
 		},
 		

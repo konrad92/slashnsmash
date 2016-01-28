@@ -305,8 +305,6 @@
 		
 		// input keymapping
 		this.keymap = {
-			type: 'keyboard',
-			
 			right: 'right',
 			left: 'left',
 			up: 'up',
@@ -323,6 +321,7 @@
 		
 		// binds common signals
 		this.bindSignal('hit', this.onHit);
+		this.bindSignal('destroy', this.onDestroy);
 	})
 	.extends(Game.Actors.Character)
 	.scope({
@@ -416,13 +415,110 @@
 					this.destroy();
 				}
 			}
+		},
+		
+		/**
+		 * On-destroy event handler.
+		 */
+		onDestroy: function() {
+			Game.app.state.camera.unfollow(this);
 		}
 	});
 	
 	// Preload assets
 	Game.Actors.Player.preload = function(app) {
-		app.loadImages('fatguy');
+		app.loadImages('fatguy', 'indicator');
 	};
+	
+	/**
+	 * Player with touch-screen useability.
+	 */
+	Game.Actors.PlayerTouchScreen = BBQ.Class(function() {
+		Game.Actors.Player.apply(this, arguments);
+		
+		// touch event holder
+		this.touch = {};
+		
+		// bind touch-screen events
+		this.bindSignal('touchstart', this.onTouchStart);
+		this.bindSignal('touchmove', this.onTouchMove);
+		this.bindSignal('touchend', this.onTouchEnd);
+	})
+	.extends(Game.Actors.Player)
+	.scope({
+		/**
+		 * On-touch informations handler.
+		 * Simulates common input events.
+		 */
+		onTouchStart: function(id, x, y) {
+			var _scrhw = Game.app.renderer.width / 2,
+				_scrhh = Game.app.renderer.height / 2;
+			
+			// movement
+			if(x < _scrhw) {
+				if(!this.touch.move) {
+					this.touch.move = {
+						id: id,
+						x: x,
+						y: y
+					};
+				}
+				
+				// create indicator
+				this.indicator = new PIXI.Sprite(Game.app.tex('indicator'));
+				this.indicator.anchor = new PIXI.Point(0.5, 0.5);
+				this.indicator.position.x = x;
+				this.indicator.position.y = y;
+				
+				Game.app.state.foreground.addChild(this.indicator);
+			}
+			// jump & attack
+			else {
+				if(y < _scrhh) {
+					this.input.jump = true;					
+				}
+				else if(x < _scrhw + _scrhw / 2) {
+					this.input.attack = 'kick';
+				}
+				else {
+					this.input.attack = 'punch';
+				}
+			}
+		},
+		
+		/**
+		 * On-touch informations handler.
+		 * Simulates common input events.
+		 */
+		onTouchMove: function(id, x, y) {
+			if(this.touch.move && this.touch.move.id === id) {
+				this.input.right = x - this.touch.move.x > 10;
+				this.input.left  = x - this.touch.move.x < -10;
+				this.input.down  = y - this.touch.move.y > 10;
+				this.input.up    = y - this.touch.move.y < -10;
+			}
+		},
+		
+		/**
+		 * On-touch informations handler.
+		 * Simulates common input events.
+		 */
+		onTouchEnd: function(id, x, y) {
+			if(this.touch.move && this.touch.move.id === id) {
+				this.touch.move = false;
+				this.input.right = false;
+				this.input.left  = false;
+				this.input.down  = false;
+				this.input.up    = false;
+				
+				// remove indicator
+				if(this.indicator) {
+					Game.app.state.foreground.removeChild(this.indicator);
+					this.indicator = false;
+				}
+			}
+		}
+	});
 	
 	
 	/**
