@@ -311,8 +311,8 @@
 			down: 'down',
 			
 			punch: 'p',
-			jump: 'o',
-			kick: 'l'
+			kick: 'o',
+			jump: 'l'
 		};
 		
 		// bind events signals
@@ -582,7 +582,7 @@
 		 */
 		findNearestPlayer: function() {
 			var players = Game.app.state.players,
-				currentDistance;
+				currentDistance = 100;
 			
 			// reset following state
 			//this.follow = false;
