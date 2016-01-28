@@ -67,6 +67,7 @@
 		
 		// character basic states
 		this.health = 100;
+		this.strength = 1;
 		this.speed = {
 			walk: 35,
 			jump: 50,
@@ -388,8 +389,9 @@
 		 * @param {BBQ.Actor} other
 		 */
 		onHit: function(other) {
-			if(! this.state.jumping) {
+			if(! this.state.hitted && ! this.state.jumping) {
 				this.scale.x = -other.scale.x;
+				this.health -= 10 * other.strength;
 				this.play('hit');
 			}
 		}
@@ -520,8 +522,15 @@
 		 * @param {BBQ.Actor} other
 		 */
 		onHit: function(other) {
-			this.scale.x = -other.scale.x;
-			this.play('hit');
+			if(! this.state.hitted) {
+				this.scale.x = -other.scale.x;
+				this.health -= 10 * other.strength;
+				this.play('hit');
+				
+				if(this.health <= 0) {
+					this.destroy();
+				}
+			}
 		}
 	});
 	

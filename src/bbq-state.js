@@ -149,6 +149,15 @@
 					Array.prototype.concat.apply([event.name], event.args)
 				);
 			}
+		},
+		
+		/**
+		 * Sign actor to destroy.
+		 */
+		destroy: function() {
+			if(this.parent && this.parent.toDelete) {
+				this.parent.toDelete.push(this);
+			}
 		}
 	});
 	
@@ -460,6 +469,7 @@
 
 			// create common actors layer
 			this.actors = new PIXI.Container();
+			this.actors.toDelete = []; // delete remaining list
 			this.camera.addChild(this.actors);
 
 			// the foreground objects container
@@ -477,6 +487,14 @@
 		 * @param {Float} delta Stage update time to apply.
 		 */
 		step: function(delta) {
+			// perform actors deleting
+			this.actors.toDelete.forEach(function(actor) {
+				if(actor) {
+					actor.emitSignal('destroy');
+					this.actors.removeChild(actor);
+				}
+			}, this);
+			
 			// sort actors depth
 			this.actors.children.sort(this.sortActorsFunc);
 			
