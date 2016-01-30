@@ -28,15 +28,23 @@
 		this.follow = false;
 		this.tick = 0;
 	    
-	    this.speed = {
-				walk: 35,
-				jump: 50,
-				hit: -50,
-				punch: 20,
-				kick: 10
+		// character basic states
+		this.health = 1000;
+		this.strength = {
+			punch: 10,
+			kick: 15
+		};
+		this.speed = {
+			walk: 35,
+			jump: 50,
+			hit: -50,
+			punch: 20,
+			kick: 10
 		};
 	})
 	.extends(Game.Actors.Enemy)
+	.properties({
+	})
 	.scope({
 		/**
 		 * Animations frames to use.
@@ -58,6 +66,7 @@
 		
 		updateState: function (delta) {
 			if(this.state.walking) {
+
 				// find nearest player
 				var player = this.findNearestPlayer();
 
@@ -70,7 +79,8 @@
 					if(this.distanceTo(player) > 20) {
 						this.moveTo(player);
 					} else if(this.tick-- <= 0) {
-						this.animation='idle';
+						this.animation = 'idle';
+						//this.tick = 5 + 10 * Math.random();
 					}
 
 					// face direction

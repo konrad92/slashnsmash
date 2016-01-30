@@ -164,7 +164,7 @@
 			this.players.push(chara);
 			
 			var cat = new Game.Actors.Cat('cat');
-			cat.position.x = 120;
+			cat.position.x = 400;
 			this.actors.addChild(cat);
 			
 			if(!Game.app.singleplayer) {
