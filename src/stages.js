@@ -163,7 +163,11 @@
 			this.camera.follow(chara);
 			this.players.push(chara);
 			
-			if(! Game.app.singleplayer) {
+			var cat = new Game.Actors.Cat('cat');
+			cat.position.x = 120;
+			this.actors.addChild(cat);
+			
+			if(!Game.app.singleplayer) {
 				chara = new Game.Actors.Player('fatguy');
 				chara.position.x = 100;
 				chara.keymap = {

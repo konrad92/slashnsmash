@@ -18,54 +18,28 @@
  */
 
 (function(Game, BBQ, PIXI) {
-	"use strict";
-	
-	/**
-	 * Creatures and animals.
-	 */
-	Game.Creatures = {};
-	
-	/**
-	 * First stage - Evil Town.
-	 */
-	Game.Creatures.Cat = function(image) {
-		// inherited ctor
-		BBQ.AnimatedActor.call(this);
-		
-		// find image by name
-		if(typeof image === 'string') {
-			image = Game.app.images[image];
-		}
-		
-		// calculate texture frame size
-		this.frameSize = new PIXI.Rectangle(0, 0, 16, 16);
-		
-		// setup shadow texture
-		this.texture = Game.app.tex('shadow');
-		this.anchor.x = this.anchor.y = 0.5;
-		
-		// add body child
-		this.body = new PIXI.Sprite(Game.app.tex(image, false));
-		this.body.anchor.x = 0.5;
-		this.body.anchor.y = 1;
-		this.body.texture.trim = this.frameSize.clone();
-		this.body.texture.crop = this.frameSize.clone();
-		this.addChild(this.body);
-		
-		// states
-		this.state = {
-			move: {}
+
+	Game.Actors.Cat = BBQ.Class(function(){
+	    Game.Actors.Enemy.call(this, "cat"); // obrazek cat.png
+	    
+	    this.frameSize = new PIXI.Rectangle(0, 0, 16, 16);
+	    
+	    // following player object
+		this.follow = false;
+		this.tick = 0;
+	    
+	    this.speed = {
+				walk: 35,
+				jump: 50,
+				hit: -50,
+				punch: 20,
+				kick: 10
 		};
-		
-		this.velocity = new PIXI.Point();
-		
-		this.have = 0;
-	};
-	
-	// extends from BBQ.Creatures class
-	BBQ.Utils.extends(Game.Creatures.Cat, BBQ.AnimatedActor, {
+	})
+	.extends(Game.Actors.Enemy)
+	.scope({
 		/**
-		 * Animation frames to use.
+		 * Animations frames to use.
 		 */
 		animations: {
 			idle: {
@@ -82,111 +56,33 @@
 			//},
 		},
 		
-		/**
-		 * Update character states.
-		 */
-		update: function(delta) {
-			// inherited super method call
-			BBQ.AnimatedActor.prototype.update.call(this, delta);
-			
-			// update animation frame
-			this.updateAnimFrame();
-			
-			// update state
-			this.updateState(delta);
-			
-			// update physics
-			this.position.x += this.velocity.x * 25 * delta;
-			this.position.y = Math.min(70, Math.max(0,
-				this.position.y + this.velocity.y * 25 * delta
-			));
-			
-			//console.log("Player(" + this.follow.position.x + ", " + this.follow.position.y + ")");
-			//console.log("Player(" + this.position.x + ", " + this.position.y + ")");
-			
-		},
-		
-		/**
-		 * Updates animation frame by texture cropping.
-		 */
-		updateAnimFrame: function() {
-			// crop texture by frame index
-			this.body.texture.crop.x = Math.floor(this.frameIndex % 3) * this.frameSize.width;
-			this.body.texture.crop.y = Math.floor(this.frameIndex / 3) *this.frameSize.height;
-			this.body.texture._updateUvs();
-		},
-		
-		/**
-		 * 
-		 */
-		updateState: function(delta) {
-			var animation = 'idle';
+		updateState: function (delta) {
+			if(this.state.walking) {
+				// find nearest player
+				var player = this.findNearestPlayer();
 
-			    this.velocity.x = -1;
-				this.scale.x = -1;
-				animation = 'walk';
+				// player found
+				if(player !== false) {
+					// clear movement state
+					this.state.movement.set();
 					
-				if(this.position.x >= this.follow.position.x && (Math.abs(this.position.y - this.follow.position.y) < 15)) {
-					this.have = 1;
-				}
-				if (this.have == 1)	{
-				    if(Math.abs(this.position.x - this.follow.position.x) > 15) {
-						this.scale.x = 1;
-						animation = 'walk';
-						if((this.follow.position.x > this.position.x) && this.have == 1) {
-							this.velocity.x = 1;
-							this.scale.x = 1;
-							if(Math.abs(this.position.y - this.follow.position.y) > 10) {
-								if((this.follow.position.y > this.position.y) && this.have == 1) {
-									this.velocity.y = 1;
-								} else {
-									this.velocity.y = -1;
-								}
-							} else {
-								this.velocity.y = 0;
-							}
-						} else {
-							this.velocity.x = -1;
-							this.scale.x = -1;
-							// zmiana kierunku ruchu sprite
-							if(Math.abs((this.position.y - this.follow.position.y) && this.have == 1) > 10) {
-								if((this.follow.position.y > this.position.y) && this.have == 1) {
-									this.velocity.y = 1;
-								} else {
-									this.velocity.y = -1;
-								} 
-							} else {
-								this.velocity.y = 0;
-							}
-						}
-					} else {
-						animation = 'idle';
-						this.velocity.x = 0;
-						this.scale.x = 1;
-						if(Math.abs(this.position.y - this.follow.position.y) > 10) {
-							animation = 'walk';
-							if((this.follow.position.y > this.position.y) && this.have == 1) {
-								this.velocity.y = 1;
-							} else {
-								this.velocity.y = -1;
-							}
-						} else {
-							this.velocity.y = 0;
-						}
+					// movement
+					if(this.distanceTo(player) > 20) {
+						this.moveTo(player);
+					} else if(this.tick-- <= 0) {
+						this.animation='idle';
 					}
-				} 
-			
-			
-			
-			// play animation
-			this.play(animation);
+
+					// face direction
+					this.scale.x = this.position.x > player.position.x ? -1 : 1;
+				}
+			}
 		}
 	});
-	
-	/**
-	 * Preload assets.
-	 */
-	Game.Creatures.Cat.preload = function(app) {
-		app.loadImages('shadow', 'red-cat', 'white-cat');
+
+	Game.Actors.Cat.preload = function(app) {
+	    app.loadImages('cat');
 	};
+
 })(window.Game = window.Game || {}, BBQ, PIXI);
+	 
