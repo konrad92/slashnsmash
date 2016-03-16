@@ -165,7 +165,7 @@
 		updateAnimFrame: function() {
 			// crop texture by frame index
 			this.body.texture.crop.x = Math.floor(this.frameIndex % 3) * this.frameSize.width;
-			this.body.texture.crop.y = Math.floor(this.frameIndex / 3) *this.frameSize.height;
+			this.body.texture.crop.y = Math.floor(this.frameIndex / 3) * this.frameSize.height;
 			this.body.texture._updateUvs();
 		},
 		
@@ -377,7 +377,7 @@
 			Game.Actors.Character.prototype.updatePhysics.call(this, delta);
 			
 			// make scene bounds
-			this.position.x = Math.max(-250, Math.min(250, this.position.x));
+			//this.position.x = Math.max(-250, Math.min(250, this.position.x));
 		},
 		
 		/**

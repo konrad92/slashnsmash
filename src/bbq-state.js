@@ -336,6 +336,17 @@
 		update: function(delta) {
 			// follow actors
 			if(this.followed.length > 0) {
+				// follow camera to all players.
+				this.position.x = this.getCenter();
+			}
+		},
+		
+		/**
+		 * Calculates center of the following objects.
+		 */
+		getCenter: function() {
+			// follow actors
+			if(this.followed.length > 0) {
 				// get positions of all actors
 				var _x = 0;
 				for(var i in this.followed) {
@@ -344,8 +355,10 @@
 				}
 				
 				// calculate centered position of actors
-				this.position.x = _x / this.followed.length;
+				return _x / this.followed.length;
 			}
+			else
+				return 0;
 		}
 	});
 	

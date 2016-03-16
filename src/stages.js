@@ -147,7 +147,21 @@
 		 */
 		enter: function() {
 			this.background.addBackground('townsky', {
-				scale: new PIXI.Point(.5, .5)
+				scale: new PIXI.Point(.1, .1)
+			});
+			
+			this.background.addBackground('townbg', {
+				scale: new PIXI.Point(.5, 1),
+				offset: new PIXI.Point(0, -200),
+				vtiled: false,
+				htiled: true
+			});
+			
+			this.background.addBackground('townfg', {
+				scale: new PIXI.Point(.65, 1),
+				offset: new PIXI.Point(0, -200),
+				vtiled: false,
+				htiled: true
 			});
 			
 			this.background.addBackground('road', {
@@ -202,6 +216,8 @@
 				var enemy = new Game.Actors.Enemy('enemyguy');
 				enemy.position.x = (Math.random() < 0.5 ? -1 : 1)*400;
 				enemy.position.y = Math.random()*100;
+				
+				enemy.position.x -= this.camera.getCenter();
 				
 				this.actors.addChild(enemy);
 			}
@@ -279,7 +295,7 @@
 		 * Common game preload function.
 		 */
 		preload: function(app) {
-			app.loadImages('road', 'townsky');
+			app.loadImages('road', 'townsky', 'townbg', 'townfg');
 		},
 		
 		/**

@@ -57,6 +57,11 @@
 			walk: {
 				time: 0.5,
 				frames: [0, 1, 0, 2]
+			},
+			hit: {
+				time: 2,
+				frames: [0, 1, 2, 3, 4, 5],
+				next: 'idle'
 			}//,
 			//attack: {
 			//	time: 0.7,
