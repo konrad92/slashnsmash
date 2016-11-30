@@ -1,0 +1,88 @@
+/*
+	style.css
+	by Konrad Nowakowski
+*/
+
+body {
+	background: black;
+	margin: 0;
+	padding: 0;
+	
+	overflow: hidden;
+}
+
+/*
+	
+*/
+.overdose {
+	margin-top: -45px;
+	text-align: center;
+	font-family: monospace;
+	font-size: 9pt;
+	color: white;
+	
+	position: fixed;
+	top: 50%;
+	left: 0;
+	right: 0;
+}
+
+/*
+	Game logger container.
+*/
+#game-logger {
+	background: rgba(0, 0, 0, .5);
+	padding: 4px;
+	font-family: monospace;
+	font-size: 11px;
+	color: white;
+	
+	min-width: 40%;
+	
+	position: absolute;
+	left: 2px;
+	top: 2px;
+	z-index: 100;
+}
+
+#game-logger > div {
+	margin-bottom: 4px;
+	padding-bottom: 4px;
+	border-bottom: solid 1px #ddd;
+}
+
+#game-logger > ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+#game-logger > ul > li {
+	display: block;
+}
+
+/*
+	Common game canvas.
+	Disables linear interpolation, nearest neightbor used instead.
+*/
+canvas {
+	display: block;
+	
+	/* up-scale */
+	-webkit-transform-origin: 0 0;
+	transform-origin: 0 0;
+	-webkit-transform: scale(4, 4);
+	transform: scale(4, 4);
+	
+	/* nearest neightbor interpolation */
+	image-rendering: -moz-crisp-edges;
+	image-rendering:   -o-pixelated;
+	image-rendering: -webkit-pixelated;
+	image-rendering: pixelated;
+	-ms-interpolation-mode: nearest-neighbor;
+	
+	/* pos-fix */
+	position: absolute;
+	left: 0;
+	top: 0;
+}
