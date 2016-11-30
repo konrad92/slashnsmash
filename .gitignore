@@ -58,3 +58,5 @@ nbactions.xml
 # Node
 node_modules
 bower_modules
+
+.project
