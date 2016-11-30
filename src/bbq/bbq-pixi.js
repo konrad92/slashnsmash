@@ -79,7 +79,7 @@
 				this.scale = 2;
 			}
 			else {
-				this.scale = 4;
+				this.scale = 3;
 			}
 
 			var propWidth = window.innerWidth % this.scale;
