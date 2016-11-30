@@ -1,0 +1,32 @@
+{
+  "name": "slashnsmash",
+  "version": "0.0.1",
+  "description": "Simple javascript fighting game",
+  "main": "lib/server",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lethiandev/slashnsmash.git"
+  },
+  "keywords": [
+    "game",
+    "pixi",
+    "javascript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/lethiandev/slashnsmash/issues"
+  },
+  "homepage": "https://github.com/lethiandev/slashnsmash#readme",
+  "devDependencies": {
+    "babel-core": "^6.18.2",
+    "babel-loader": "^6.2.8",
+    "babel-preset-es2015": "^6.18.0",
+    "webpack": "^2.1.0-beta.27",
+    "webpack-dev-server": "^2.1.0-beta.12"
+  }
+}
