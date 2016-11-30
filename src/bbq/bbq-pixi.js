@@ -51,7 +51,9 @@
 			this.renderer = PIXI.autoDetectRenderer(
 				window.innerWidth,
 				window.innerHeight,
-				options
+				Object.assign({
+					roundPixels: true
+				}, options)
 			);
 			
 			// keep aspect ratio (if specified)
@@ -77,22 +79,23 @@
 				this.scale = 2;
 			}
 			else {
-				this.scale = 3;
+				this.scale = 4;
 			}
+
+			var propWidth = window.innerWidth % this.scale;
+			var propHeight = window.innerHeight % this.scale;
+			var newWidth = window.innerWidth + (this.scale - propWidth);
+			var newHeight = window.innerHeight + (this.scale - propHeight);
 			
 			// resize canvas element
 			this.renderer.resize(
-				window.innerWidth / this.scale,
-				window.innerHeight / this.scale
+				newWidth / this.scale,
+				newHeight / this.scale
 			);
 
 			// scale-up canvas element via CSS transform property
-			var scale2d = 'scale('+this.scale+','+this.scale+')';
-			this.renderer.view.style.msTransform = scale2d;
-			this.renderer.view.style.webkitTransform = scale2d;
-			this.renderer.view.style.MozTransform = scale2d;
-			this.renderer.view.style.OTransform = scale2d;
-			this.renderer.view.style.transform = scale2d;
+			this.renderer.view.style.width = newWidth + 'px';
+			this.renderer.view.style.height = newHeight + 'px';
 		},
 		
 		/**

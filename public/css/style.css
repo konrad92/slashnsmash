@@ -68,12 +68,6 @@ body {
 canvas {
 	display: block;
 	
-	/* up-scale */
-	-webkit-transform-origin: 0 0;
-	transform-origin: 0 0;
-	-webkit-transform: scale(4, 4);
-	transform: scale(4, 4);
-	
 	/* nearest neightbor interpolation */
 	image-rendering: -moz-crisp-edges;
 	image-rendering:   -o-pixelated;
